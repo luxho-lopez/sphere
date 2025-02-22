@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sphere - New Post</title>
+    <link rel="stylesheet" href="/sphere/styles/main.css">
+</head>
+<body>
+    <header>
+        <div class="logo"><a href="/sphere/index.html"><h1>Sphere</h1></a></div>
+        <nav>
+            <ul id="nav-menu">
+                <li class="login-link"><a href="/sphere/login.html">Log In</a></li>
+                <li class="register-link"><a href="/sphere/register.html">Register</a></li>
+                <li class="new_post-link"><a href="/sphere/new_post.html">New Post</a></li>
+                <li class="notify-link"><a href="/sphere/notify.html">Notify</a></li>
+                <li class="profile-link">
+                    <div id="user-profile"></div> <!-- Submenú se genera aquí -->
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <aside>
+        <nav>
+            <ul id="sidebar-menu">
+                <li><a href="/sphere/index.html"><ion-icon name="home-outline"></ion-icon> Home</a></li>
+                <li><a href="/sphere/trending.html"><ion-icon name="trending-up-outline"></ion-icon> Trending</a></li>
+                <li><a href="/sphere/explorer.html"><ion-icon name="planet-outline"></ion-icon> Explore</a></li>
+                <li><a href="/sphere/all_posts.html"><ion-icon name="podium-outline"></ion-icon> All Posts</a></li>
+            </ul>
+        </nav>
+    </aside>
+    <main>
+        <section>
+            <h2>Create a New Post</h2>
+            <form id="new-post-form">
+                <input type="text" name="titulo" placeholder="Title" required>
+                <textarea name="contenido" placeholder="Content" required></textarea>
+                <input type="file" name="images[]" multiple>
+                <select name="categoria_id">
+                    <option value="1">Lifestyle</option>
+                    <option value="2">Travel</option>
+                    <option value="3">Fashion</option>
+                    <option value="4">Technology</option>
+                    <option value="5">Health</option>
+                </select>
+                <button type="submit">Post</button>
+            </form>
+        </section>
+    </main>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="/sphere/scripts/script.js" defer></script>
+    <script src="/sphere/scripts/new_post.js" defer></script>
+</body>
+</html>
