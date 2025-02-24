@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sphere - Profile</title>
+    <title>Sphere - Edit Post</title>
     <link rel="stylesheet" href="/sphere/styles/main.css">
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
 </head>
 <body>
     <header>
@@ -15,8 +14,9 @@
                 <li class="new_post-link"><a href="/sphere/new_post.html">New Post</a></li>
                 <li class="notify-link"><a href="/sphere/notify.html">Notify</a></li>
                 <li class="profile-link">
-                    <div id="user-profile"></div> <!-- Submenú se genera aquí -->
+                    <div id="user-profile"></div>
                 </li>
+                <li class="login-link"><a href="/sphere/login.html">Log In</a></li>
             </ul>
         </nav>
     </header>
@@ -31,12 +31,34 @@
         </nav>
     </aside>
     <main>
-        <section id="profile"></section>
+        <section id="edit-post">
+            <h2>Edit Post</h2>
+            <form id="edit-post-form">
+                <div>
+                    <label for="categoria_id">Category:</label>
+                    <select id="categoria_id" name="categoria_id" required>
+                        <option value="1">Lifestyle</option>
+                        <option value="2">Travel</option>
+                        <option value="3">Fashion</option>
+                        <option value="4">Technology</option>
+                        <option value="5">Health</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="titulo">Title:</label>
+                    <input type="text" id="titulo" name="titulo" required>
+                </div>
+                <div>
+                    <label for="contenido">Content:</label>
+                    <textarea class="post-textarea" id="contenido" name="contenido" required></textarea>
+                </div>
+                <button type="submit">Save Changes</button>
+            </form>
+        </section>
     </main>
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js" defer></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="/sphere/scripts/script.js" defer></script>
-    <script src="/sphere/scripts/profile.js" defer></script>
+    <script src="/sphere/scripts/edit_post.js" defer></script>
 </body>
 </html>

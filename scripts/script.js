@@ -17,6 +17,7 @@ async function fetchUserProfile() {
         const logoutLink = document.querySelector('.logout-link');
 
         if (!response.ok) throw new Error('Unauthorized');
+
         const data = await response.json();
         const user = data.success && data.usuario?.length ? data.usuario[0] : null;
 
@@ -25,12 +26,11 @@ async function fetchUserProfile() {
             profileHeader.innerHTML = `
                 <a href="/sphere/profile.html" class="user-profile-link">
                     <img src="${user.foto_perfil || '/images/profile/default-avatar.png'}" alt="${user.nombre}" class="user-profile-avatar">
-                    <span class="user-name-header">${user.nombre}</span>
                 </a>
                 <ul class="sub-menu">
-                    <li><a href="/sphere/profile.html">View Profile</a></li>
-                    <li><a href="/sphere/change_password.html">Change Password</a></li>
-                    <li><a href="/sphere/api/logout.php">Log Out</a></li>
+                    <li><a href="/sphere/profile.html">${user.nombre} - Ver perfil</a></li>
+                    <li><a href="/sphere/change_password.html">Cambiar contraseña</a></li>
+                    <li><a href="/sphere/api/logout.php">Cerrar sesión</a></li>
                 </ul>
             `;
             if (profileLink) profileLink.style.display = 'block';
@@ -40,8 +40,8 @@ async function fetchUserProfile() {
             if (registerLink) registerLink.style.display = 'none';
             if (logoutLink) logoutLink.style.display = 'none'; // Ocultar enlace suelto de logout si existe
         } else {
-            // Sin sesión: mostrar solo "Log In" y ocultar enlaces
-            profileHeader.innerHTML = '<a href="/sphere/login.html">Log In</a>';
+            // Sin sesión: mostrar solo "Iniciar sesión" y ocultar enlaces
+            profileHeader.innerHTML = '<a href="/sphere/login.html">Iniciar sesión</a>';
             if (profileLink) profileLink.style.display = 'none';
             if (notifyLink) notifyLink.style.display = 'none';
             if (newPostLink) newPostLink.style.display = 'none';
@@ -56,11 +56,11 @@ async function fetchUserProfile() {
         const notifyLink = document.querySelector('.notify-link');
         const newPostLink = document.querySelector('.new_post-link');
         const loginLink = document.querySelector('.login-link');
-        const registerLink = document.querySelector('.login-link');
+        const registerLink = document.querySelector('.register-link');
         const logoutLink = document.querySelector('.logout-link');
 
         // Error (no autenticado): ocultar enlaces y submenú
-        profileHeader.innerHTML = '<a href="/sphere/login.html">Log In</a>';
+        profileHeader.innerHTML = '<a href="/sphere/login.html">Iniciar sesión</a>';
         if (profileLink) profileLink.style.display = 'none';
         if (notifyLink) notifyLink.style.display = 'none';
         if (newPostLink) newPostLink.style.display = 'none';
@@ -94,7 +94,7 @@ function restrictUnauthorizedURLs() {
         '/sphere/index.html', '/sphere/profile.html', '/sphere/new_post.html',
         '/sphere/notify.html', '/sphere/trending.html', '/sphere/explorer.html',
         '/sphere/all_posts.html', '/sphere/login.html', '/sphere/register.html',
-        '/sphere/change_password.html'
+        '/sphere/change_password.html', '/sphere/edit_post.html'
     ];
     const currentPath = window.location.pathname;
     if (!validPaths.includes(currentPath)) {

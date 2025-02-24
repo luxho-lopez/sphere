@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const data = await response.json();
                 if (data.success) {
+                    alert('Post created successfully.');
                     // Redirigir solo después de que la solicitud se complete
                     window.location.href = 'index.html';
                 } else {

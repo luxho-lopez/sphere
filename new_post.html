@@ -35,9 +35,6 @@
         <section>
             <h2>Create a New Post</h2>
             <form id="new-post-form">
-                <input type="text" name="titulo" placeholder="Title" required>
-                <textarea name="contenido" placeholder="Content" required></textarea>
-                <input type="file" name="images[]" multiple>
                 <select name="categoria_id">
                     <option value="1">Lifestyle</option>
                     <option value="2">Travel</option>
@@ -45,6 +42,9 @@
                     <option value="4">Technology</option>
                     <option value="5">Health</option>
                 </select>
+                <input type="text" name="titulo" placeholder="Title" required>
+                <textarea class="post-textarea" name="contenido" placeholder="Content" required></textarea>
+                <input type="file" name="images[]" multiple>
                 <button type="submit">Post</button>
             </form>
         </section>
