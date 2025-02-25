@@ -1,4 +1,3 @@
-// /sphere/scripts/register.js
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('register-form');
     if (form) {

@@ -1,9 +1,8 @@
-// /sphere/scripts/new_post.js
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('new-post-form');
     if (form) {
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevenir el envío predeterminado del formulario
+            e.preventDefault();
             const formData = new FormData(form);
 
             try {
@@ -14,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 if (data.success) {
                     alert('Post created successfully.');
-                    // Redirigir solo después de que la solicitud se complete
                     window.location.href = 'index.html';
                 } else {
                     alert('Error creating post: ' + (data.message || 'Unknown error'));

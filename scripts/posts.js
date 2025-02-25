@@ -45,7 +45,7 @@ async function fetchPosts() {
 
 async function createPostElement(post, index) {
     const postElement = document.createElement('div');
-    postElement.className = 'post-card';
+    postElement.className = 'bg-white shadow-md rounded-lg p-6 mb-6 relative';
     const truncatedContent = truncateContent(post.contenido, 50);
     const images = createImageCarousel(post.images, post.titulo, index);
     const commentsList = post.comments || [];
@@ -53,91 +53,94 @@ async function createPostElement(post, index) {
     const hasMoreComments = commentsList.length > 2;
     const currentUserId = await getCurrentUserId();
     const postUserId = parseInt(post.usuario_id);
-
     const commentsHTML = visibleComments.map(comment => createCommentHTML(comment, currentUserId)).join('');
 
     postElement.innerHTML = `
-        <div class="post-card-header">
-            <div class="post-meta">
-                <div class="post-meta-data">
-                    <a href="#">
-                        <img src="${post.author.foto_perfil || '/sphere/images/profile/default-avatar.png'}" class="user-profile-avatar">
-                        <span>${post.author.name} ${post.author.lastname}</span>
-                        <span style="margin-left: 10px; font-size: 0.7rem; color:gray;">${new Date(post.fecha_publicacion).toLocaleDateString()}</span>
-                    </a>
-                </div>
-                <div class="post-actions">
-                    <ion-icon name="ellipsis-vertical-outline" class="submenu-toggle"></ion-icon>
-                    <div class="submenu" style="display: none;">
-                        ${postUserId === currentUserId ? `
-                            <button class="edit-post-btn">Edit Post</button>
-                            <button class="delete-post-btn">Delete Post</button>
-                        ` : '<span>No actions available</span>'}
-                    </div>
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center space-x-3">
+                <a href="#" class="flex items-center space-x-2">
+                    <img src="${post.author.foto_perfil || '/sphere/images/profile/default-avatar.png'}" class="w-8 h-8 rounded-full object-cover">
+                    <span class="text-gray-800 font-medium">${post.author.name} ${post.author.lastname}</span>
+                    <span class="text-gray-500 text-xs">${new Date(post.fecha_publicacion).toLocaleDateString()}</span>
+                </a>
+            </div>
+            <div class="relative z-10">
+                <ion-icon name="ellipsis-vertical-outline" class="text-gray-600 cursor-pointer submenu-toggle"></ion-icon>
+                <div class="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg submenu z-20 hidden">
+                    ${postUserId === currentUserId ? `
+                        <button class="edit-post-btn block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Edit Post</button>
+                        <button class="delete-post-btn block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Delete Post</button>
+                    ` : '<span class="block px-4 py-2 text-gray-700">No actions available</span>'}
                 </div>
             </div>
         </div>
-        <div class="post-card-body">
+        <div class="mb-4">
             ${images}
-            <div class="post-card-content">
-                <h3>${post.titulo}</h3>
-                <p class="post-content">${truncatedContent}</p>
-                <button class="read-more-btn">Read More</button>
-            </div>
-            <div class="comments-section" data-post-id="${post.id}">
-                <textarea class="comment-input" placeholder="Add a comment..."></textarea>
-                <button class="submit-comment-btn">Post</button>
+            <div class="mt-3">
+                <h3 class="text-lg font-semibold text-gray-800">${post.titulo}</h3>
+                <p class="post-content text-gray-600 text-sm mt-1">${truncatedContent}</p>
+                <button class="read-more-btn text-blue-500 hover:underline text-sm mt-2">Read More</button>
             </div>
         </div>
-        <div class="post-card-footer">
-            <div class="reactions">
-                <button class="reaction-btn" data-post-id="${post.id}">
-                    <ion-icon name="${post.user_liked ? 'heart' : 'heart-outline'}" class="reaction-icon" style="color: ${post.user_liked ? 'green' : 'white'};"></ion-icon>
-                    <span class="like-count">${post.like_count}</span>
+        <div class="comments-section border-t pt-4" data-post-id="${post.id}">
+            <textarea class="comment-input w-full p-2 border rounded resize-none text-sm" placeholder="Add a comment..."></textarea>
+            <button class="submit-comment-btn mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Post</button>
+        </div>
+        <div class="flex flex-col mt-4">
+            <div class="flex justify-around mb-2 space-x-4">
+                <button class="reaction-btn flex items-center space-x-1" data-post-id="${post.id}">
+                    <ion-icon name="${post.user_liked ? 'heart' : 'heart-outline'}" class="text-base" style="color: ${post.user_liked ? 'green' : 'gray'};"></ion-icon>
+                    <span class="like-count text-gray-600 text-sm">${post.like_count}</span>
                 </button>
-                <button class="comment-btn">
-                    <ion-icon name="chatbubbles-outline" style="color: ${commentsList.length >= 1 ? 'green' : 'white'};"></ion-icon>
-                    <span class="comment-count">${commentsList.length}</span> <!-- Añadimos el conteo aquí -->
+                <button class="comment-btn flex items-center space-x-1">
+                    <ion-icon name="chatbubbles-outline" class="text-base" style="color: ${commentsList.length >= 1 ? 'green' : 'gray'};"></ion-icon>
+                    <span class="comment-count text-gray-600 text-sm">${commentsList.length}</span>
                 </button>
             </div>
             <div>
-                <div class="comments-list">${commentsHTML}</div>
-                ${hasMoreComments ? `<button class="view-more-comments-btn">View More Comments (${commentsList.length - 2})</button>` : ''}
+                <div class="comments-list space-y-2">${commentsHTML}</div>
+                ${hasMoreComments ? `<button class="view-more-comments-btn text-blue-500 hover:underline text-sm mt-2">View More Comments (${commentsList.length - 2})</button>` : ''}
             </div>
         </div>
     `;
 
-    // Listeners sin cambios (por ahora)
-    postElement.querySelector('.reaction-btn').addEventListener('click', () => handleLike(post, postElement));
-    postElement.querySelector('.read-more-btn').addEventListener('click', () => {
-        postElement.querySelector('.post-content').textContent = post.contenido;
-        postElement.querySelector('.read-more-btn').style.display = 'none';
-    });
-    postElement.querySelector('.submit-comment-btn').addEventListener('click', () => handleComment(post.id, postElement));
-    
+    const reactionBtn = postElement.querySelector('.reaction-btn');
+    if (reactionBtn) reactionBtn.addEventListener('click', () => handleLike(post, postElement));
+
+    const readMoreBtn = postElement.querySelector('.read-more-btn');
+    if (readMoreBtn) {
+        readMoreBtn.addEventListener('click', () => {
+            const content = postElement.querySelector('.post-content');
+            if (content) content.textContent = post.contenido;
+            readMoreBtn.style.display = 'none';
+        });
+    }
+
+    const submitCommentBtn = postElement.querySelector('.submit-comment-btn');
+    if (submitCommentBtn) submitCommentBtn.addEventListener('click', () => handleComment(post.id, postElement));
+
     const submenuToggle = postElement.querySelector('.submenu-toggle');
     const submenu = postElement.querySelector('.submenu');
     if (submenuToggle && submenu) {
         submenuToggle.addEventListener('click', (e) => {
             e.stopPropagation();
-            submenu.style.display = submenu.style.display === 'none' ? 'block' : 'none';
+            submenu.classList.toggle('hidden');
         });
     }
-    
+
     const editBtn = postElement.querySelector('.edit-post-btn');
     const deleteBtn = postElement.querySelector('.delete-post-btn');
     if (editBtn) editBtn.addEventListener('click', () => editPost(post));
     if (deleteBtn) deleteBtn.addEventListener('click', () => deletePost(post.id, postElement));
-    
+
     const viewMoreBtn = postElement.querySelector('.view-more-comments-btn');
-    if (viewMoreBtn) {
-        viewMoreBtn.addEventListener('click', () => expandComments(post, postElement, currentUserId));
-    }
-    
-    postElement.querySelectorAll('.edit-comment-btn').forEach(btn => {
+    if (viewMoreBtn) viewMoreBtn.addEventListener('click', () => expandComments(post, postElement, currentUserId));
+
+    const editCommentBtns = postElement.querySelectorAll('.edit-comment-btn');
+    editCommentBtns.forEach(btn => {
         btn.addEventListener('click', () => editComment(btn.dataset.commentId, postElement));
     });
-    
+
     return postElement;
 }
 
@@ -146,17 +149,17 @@ document.addEventListener('click', (event) => {
     submenus.forEach(submenu => {
         const submenuToggle = submenu.previousElementSibling;
         if (submenu && !submenu.contains(event.target) && !submenuToggle.contains(event.target)) {
-            submenu.style.display = 'none';
+            submenu.classList.add('hidden');
         }
     });
 });
 
 function createCommentHTML(comment, currentUserId) {
     return `
-        <div class="comment" data-comment-id="${comment.id}">
-            <p>${comment.contenido} <small>- ${comment.user_name} (${new Date(comment.fecha_creacion).toLocaleString()})</small>
+        <div class="comment flex items-start space-x-2" data-comment-id="${comment.id}">
+            <p class="text-gray-600 text-sm">${comment.contenido} <span class="text-gray-500 text-xs">- ${comment.user_name} (${new Date(comment.fecha_creacion).toLocaleString()})</span>
                 ${comment.user_id === currentUserId ? `
-                    <button class="edit-comment-btn" data-comment-id="${comment.id}">Edit</button>
+                    <button class="edit-comment-btn text-blue-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Edit</button>
                 ` : ''}
             </p>
         </div>
@@ -166,14 +169,14 @@ function createCommentHTML(comment, currentUserId) {
 function createImageCarousel(images, title, index) {
     if (!images?.length) return '';
     return images.length > 1 ? `
-        <div id="swiper-container-${index}" class="swiper-container">
+        <div id="swiper-container-${index}" class="swiper-container mb-4 max-w-full">
             <div class="swiper-wrapper">
-                ${images.map(img => `<div class="swiper-slide"><img src="${img}" alt="${title}" class="post-image"></div>`).join('')}
+                ${images.map(img => `<div class="swiper-slide"><img src="${img}" alt="${title}" class="w-full h-48 object-cover rounded-lg"></div>`).join('')}
             </div>
             <div class="swiper-pagination"></div>
             <div class="swiper-button-next"></div>
             <div class="swiper-button-prev"></div>
-        </div>` : `<img src="${images[0]}" alt="${title}" class="post-image">`;
+        </div>` : `<img src="${images[0]}" alt="${title}" class="w-full h-48 object-cover rounded-lg mb-4">`;
 }
 
 async function handleLike(post, postElement) {
@@ -189,9 +192,15 @@ async function handleLike(post, postElement) {
             post.user_liked = !post.user_liked;
             post.like_count += post.user_liked ? 1 : -1;
             const btn = postElement.querySelector('.reaction-btn');
-            btn.querySelector('ion-icon').name = post.user_liked ? 'heart' : 'heart-outline';
-            btn.querySelector('ion-icon').style.color = post.user_liked ? 'green' : 'white';
-            postElement.querySelector('.like-count').textContent = `${post.like_count}`;
+            if (btn) {
+                const icon = btn.querySelector('ion-icon');
+                if (icon) {
+                    icon.name = post.user_liked ? 'heart' : 'heart-outline';
+                    icon.style.color = post.user_liked ? 'green' : 'gray';
+                }
+                const count = btn.querySelector('.like-count');
+                if (count) count.textContent = `${post.like_count}`;
+            }
         } else {
             console.error('Like action failed:', data.message);
         }
@@ -214,19 +223,32 @@ async function handleComment(postId, postElement) {
         if (data.success) {
             const userName = await getCurrentUserName();
             const currentUserId = await getCurrentUserId();
-            postElement.querySelector('.comments-list').innerHTML += createCommentHTML({
-                id: data.comment_id || Date.now(),
-                contenido: content,
-                user_name: userName,
-                fecha_creacion: new Date(),
-                user_id: currentUserId
-            }, currentUserId);
+            const commentsList = postElement.querySelector('.comments-list');
+            if (commentsList) {
+                const newCommentHTML = createCommentHTML({
+                    id: data.comment_id || Date.now(),
+                    contenido: content,
+                    user_name: userName,
+                    fecha_creacion: new Date(),
+                    user_id: currentUserId
+                }, currentUserId);
+                commentsList.insertAdjacentHTML('beforeend', newCommentHTML);
+                
+                // Añadir event listener al nuevo botón "Edit"
+                const newEditBtn = commentsList.querySelector(`.edit-comment-btn[data-comment-id="${data.comment_id || Date.now()}"]`);
+                if (newEditBtn) {
+                    newEditBtn.addEventListener('click', () => editComment(newEditBtn.dataset.commentId, postElement));
+                }
+            }
             commentInput.value = '';
 
-            // Actualizar el conteo de comentarios
             const commentCount = postElement.querySelector('.comment-count');
-            const currentCount = parseInt(commentCount.textContent) || 0;
-            commentCount.textContent = currentCount + 1;
+            if (commentCount) {
+                const currentCount = parseInt(commentCount.textContent) || 0;
+                commentCount.textContent = currentCount + 1;
+                const commentIcon = postElement.querySelector('.comment-btn ion-icon');
+                if (commentIcon) commentIcon.style.color = (currentCount + 1) >= 1 ? 'green' : 'gray';
+            }
 
             updateViewMoreButton(postElement, postId);
         } else {
@@ -240,20 +262,23 @@ async function handleComment(postId, postElement) {
 function expandComments(post, postElement, currentUserId) {
     const commentsList = postElement.querySelector('.comments-list');
     const totalComments = post.comments.length;
-    commentsList.innerHTML = post.comments.map(comment => createCommentHTML(comment, currentUserId)).join('');
-    
+    if (commentsList) {
+        commentsList.innerHTML = post.comments.map(comment => createCommentHTML(comment, currentUserId)).join('');
+    }
     const viewMoreBtn = postElement.querySelector('.view-more-comments-btn');
     if (viewMoreBtn && totalComments <= commentsList.querySelectorAll('.comment').length) {
-        viewMoreBtn.style.display = 'none'; // Solo ocultar si todos los comentarios están visibles
+        viewMoreBtn.style.display = 'none';
     }
 
-    postElement.querySelectorAll('.edit-comment-btn').forEach(btn => {
+    const editCommentBtns = postElement.querySelectorAll('.edit-comment-btn');
+    editCommentBtns.forEach(btn => {
         btn.addEventListener('click', () => editComment(btn.dataset.commentId, postElement));
     });
 }
 
 async function editComment(commentId, postElement) {
     const commentDiv = postElement.querySelector(`.comment[data-comment-id="${commentId}"]`);
+    if (!commentDiv) return;
     const commentText = commentDiv.querySelector('p').childNodes[0].textContent.trim();
     const newContent = prompt('Edit your comment:', commentText);
     if (newContent && newContent !== commentText) {
@@ -265,9 +290,10 @@ async function editComment(commentId, postElement) {
             });
             const data = await response.json();
             if (data.success) {
-                commentDiv.querySelector('p').innerHTML = `${newContent} <small>- ${commentDiv.querySelector('small').textContent}</small>
-                    <button class="edit-comment-btn" data-comment-id="${commentId}">Edit</button>`;
-                commentDiv.querySelector('.edit-comment-btn').addEventListener('click', () => editComment(commentId, postElement));
+                commentDiv.querySelector('p').innerHTML = `${newContent} <span class="text-gray-500 text-xs">- ${commentDiv.querySelector('span').textContent}</span>
+                    <button class="edit-comment-btn text-blue-500 hover:underline text-xs ml-2" data-comment-id="${commentId}">Edit</button>`;
+                const editBtn = commentDiv.querySelector('.edit-comment-btn');
+                if (editBtn) editBtn.addEventListener('click', () => editComment(commentId, postElement));
             } else {
                 console.error('Edit comment failed:', data.message);
             }
@@ -288,19 +314,20 @@ function updateViewMoreButton(postElement, postId) {
         const post = posts.find(p => p.id === postId);
         if (post) {
             const commentsList = postElement.querySelector('.comments-list');
-            const visibleComments = commentsList.querySelectorAll('.comment').length;
+            const visibleComments = commentsList ? commentsList.querySelectorAll('.comment').length : 0;
             const totalComments = post.comments.length;
 
             if (totalComments > 2) {
                 let viewMoreBtn = postElement.querySelector('.view-more-comments-btn');
                 if (!viewMoreBtn) {
                     viewMoreBtn = document.createElement('button');
-                    viewMoreBtn.className = 'view-more-comments-btn';
-                    postElement.querySelector('.comments-section').appendChild(viewMoreBtn);
+                    viewMoreBtn.className = 'view-more-comments-btn text-blue-500 hover:underline text-sm mt-2';
+                    const commentsSection = postElement.querySelector('.comments-section');
+                    if (commentsSection) commentsSection.appendChild(viewMoreBtn);
                 }
                 viewMoreBtn.textContent = `View More Comments (${totalComments - visibleComments})`;
                 viewMoreBtn.style.display = 'block';
-                viewMoreBtn.addEventListener('click', () => expandComments(post, postElement));
+                viewMoreBtn.addEventListener('click', () => expandComments(post, postElement, currentUserId));
             }
         }
     })
@@ -316,7 +343,7 @@ async function getCurrentUserId() {
         });
         const data = await response.json();
         if (data.success && data.usuario?.length) {
-            const userId = parseInt(data.usuario[0].id); // Ya es número
+            const userId = parseInt(data.usuario[0].id);
             localStorage.setItem('userId', userId);
             return userId;
         }
@@ -341,8 +368,7 @@ function truncateContent(content, wordLimit) {
 
 async function editPost(post) {
     const currentUserId = await getCurrentUserId();
-    const postUserId = parseInt(post.usuario_id); // Convertir a número
-
+    const postUserId = parseInt(post.usuario_id);
     if (postUserId !== currentUserId) {
         alert('You do not have permission to edit this post.');
         return;
@@ -351,7 +377,7 @@ async function editPost(post) {
 }
 
 async function deletePost(postId, postElement) {
-    const currentUserId = getCurrentUserId();
+    const currentUserId = await getCurrentUserId();
     const confirmDelete = confirm('Are you sure you want to delete this post?');
     if (confirmDelete) {
         try {

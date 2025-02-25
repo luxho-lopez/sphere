@@ -1,40 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sphere - Home</title>
     <link rel="stylesheet" href="/sphere/styles/main.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
 </head>
-<body>
-    <header>
-        <div class="logo"><a href="/sphere/index.html"><h1>Sphere</h1></a></div>
+
+<body class="flex flex-col min-h-screen bg-gray-100">
+    <header class="fixed top-0 left-0 w-full bg-white shadow-md p-4 flex justify-between items-center">
+        <div class="logo flex items-center space-x-2">
+            <a href="/sphere/index.html">
+                <h1 class="text-2xl font-bold text-gray-800">Sphere</h1>
+            </a>
+            <!-- El botón se agrega dinámicamente por script.js -->
+        </div>
+        <div class="search-div w-full max-w-sm min-w-[200px] md:block hidden">
+            <div class="relative">
+                <input
+                    class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-3 pr-28 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+                    placeholder="Posts..." />
+                <button
+                    class="bg-blue-500 absolute top-1 right-1 flex items-center rounded bg-slate-800 py-1 px-2.5 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                    type="button">
+                    <ion-icon name="search-outline"></ion-icon>
+                    Search
+                </button>
+            </div>
+        </div>
+        <button class="search-icon md:hidden text-gray-600 hover:text-gray-800 focus:outline-none">
+            <ion-icon name="search-outline" class="text-2xl"></ion-icon>
+        </button>
         <nav>
-            <ul id="nav-menu">
-                <li class="login-link"><a href="/sphere/login.html">Log In</a></li>
-                <li class="register-link"><a href="/sphere/register.html">Register</a></li>
-                <li class="new_post-link"><a href="/sphere/new_post.html">New Post</a></li>
-                <li class="notify-link"><a href="/sphere/notify.html">Notify</a></li>
-                <li class="profile-link">
-                    <div id="user-profile"></div> <!-- Submenú se genera aquí -->
+            <ul id="nav-menu" class="flex items-center space-x-6">
+                <li class="login-link"><a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800">Log In</a></li>
+                <li class="register-link"><a href="/sphere/register.html" class="text-gray-600 hover:text-gray-800">Register</a></li>
+                <li class="new_post-link hidden">
+                    <a href="/sphere/new_post.html" class="text-gray-600 hover:text-gray-800 md:block hidden">New Post</a>
+                    <button class="new-post-icon md:hidden text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <ion-icon name="add-outline" class="text-2xl"></ion-icon>
+                    </button>
+                </li>
+                <li class="notify-link hidden">
+                    <a href="/sphere/notify.html" class="text-gray-600 hover:text-gray-800 md:block hidden">Notify</a>
+                    <button class="notify-icon md:hidden text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <ion-icon name="notifications-outline" class="text-2xl"></ion-icon>
+                    </button>
+                </li>
+                <li class="profile-link relative hidden">
+                    <div id="user-profile" class="text-gray-600 hover:text-gray-800 cursor-pointer"></div>
                 </li>
             </ul>
         </nav>
     </header>
-
-    <aside>
+    <div class="search-submenu absolute top-16 right-4 bg-white border border-slate-200 rounded-lg shadow-md hidden z-60">
+        <input type="text" class="search-input" placeholder="Search posts..." />
+        <button class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 mt-2 w-full">Search</button>
+    </div>
+    <div class="notify-submenu absolute top-16 right-4 bg-white border border-slate-200 rounded-lg shadow-md hidden z-60">
+        <div class="notification-list max-h-60 overflow-y-auto">
+            <!-- Notificaciones simuladas (puedes reemplazar con datos dinámicos) -->
+            <div class="notification-item">New like on your post!</div>
+            <div class="notification-item">Comment received on your post.</div>
+            <div class="notification-item">New follower added.</div>
+        </div>
+    </div>
+    <aside class="fixed top-0 left-0 w-64 h-full bg-white shadow-md p-4 hidden md:block">
         <nav>
-            <ul id="sidebar-menu">
-                <li><a href="/sphere/index.html"><ion-icon name="home-outline"></ion-icon> Home</a></li>
-                <li><a href="/sphere/trending.html"><ion-icon name="trending-up-outline"></ion-icon> Trending</a></li>
-                <li><a href="/sphere/explorer.html"><ion-icon name="planet-outline"></ion-icon> Explore</a></li>
-                <li><a href="/sphere/all_posts.html"><ion-icon name="podium-outline"></ion-icon> All Posts</a></li>
+            <ul id="sidebar-menu" class="space-y-4 mt-24">
+                <li><a href="/sphere/index.html" class="px-10 py-2 flex items-center text-gray-600 hover:text-gray-800"><ion-icon name="home-outline" class="mr-4"></ion-icon> Home</a></li>
+                <li><a href="/sphere/trending.html" class="px-10 py-2 flex items-center text-gray-600 hover:text-gray-800"><ion-icon name="trending-up-outline" class="mr-4"></ion-icon> Trending</a></li>
+                <li><a href="/sphere/explorer.html" class="px-10 py-2 flex items-center text-gray-600 hover:text-gray-800"><ion-icon name="planet-outline" class="mr-4"></ion-icon> Explore</a></li>
+                <li><a href="/sphere/all_posts.html" class="px-10 py-2 flex items-center text-gray-600 hover:text-gray-800"><ion-icon name="podium-outline" class="mr-4"></ion-icon> All Posts</a></li>
             </ul>
         </nav>
     </aside>
-    <main>
-        <section id="posts"></section>
+    <main class="flex-1 ml-0 md:ml-64 mt-16 p-6">
+        <section id="posts" class="max-w-2xl mx-auto"></section>
     </main>
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js" defer></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
@@ -42,4 +87,5 @@
     <script src="/sphere/scripts/script.js" defer></script>
     <script src="/sphere/scripts/posts.js" defer></script>
 </body>
+
 </html>

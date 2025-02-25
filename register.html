@@ -4,20 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sphere - Register</title>
-    <link rel="stylesheet" href="/sphere/styles/main.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
 </head>
-<body>
-    <main>
-        <section>
-            <h2>Register</h2>
-            <form id="register-form">
-                <input type="email" name="correo" placeholder="Email" required>
-                <input type="text" name="nombre" placeholder="First Name" required>
-                <input type="text" name="apellido" placeholder="Last Name" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <button type="submit">Register</button>
+<body class="flex flex-col min-h-screen bg-gray-100">
+    <main class="flex-1 p-6 flex items-center justify-center">
+        <section class="max-w-md w-full">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Register</h2>
+            <form id="register-form" class="bg-white shadow-md rounded-lg p-6 space-y-4">
+                <a href="/sphere/index.html"><img src="/sphere/images/sphere.gif" alt="sphere" srcset=""></a>
+                <input type="email" name="correo" placeholder="Email" class="w-full p-2 border rounded text-sm" required>
+                <input type="text" name="nombre" placeholder="First Name" class="w-full p-2 border rounded text-sm" required>
+                <input type="text" name="apellido" placeholder="Last Name" class="w-full p-2 border rounded text-sm" required>
+                <input type="password" name="password" placeholder="Password" class="w-full p-2 border rounded text-sm" required>
+                <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Register</button>
+                <p class="text-center text-gray-600 text-sm">Already have an account? <a href="login.html" class="text-blue-500 hover:underline">Login</a></p>
             </form>
-            <p>Already have an account? <a href="login.html">Login</a></p>
         </section>
     </main>
     <script src="/sphere/scripts/register.js" defer></script>

@@ -1,9 +1,8 @@
-// /sphere/scripts/login.js
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('login-form');
     if (form) {
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevenir recarga del formulario
+            e.preventDefault();
             const formData = new FormData(form);
 
             try {

@@ -1,4 +1,3 @@
-// /sphere/scripts/change_password.js
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('change-password-form');
     if (form) {
