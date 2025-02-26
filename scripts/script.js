@@ -1,18 +1,128 @@
-document.addEventListener('DOMContentLoaded', () => {
-    fetchUserProfile(); // Solo llamamos a fetchUserProfile, que manejará setupMenuToggle
-    highlightSelectedMenuItem();
-    setupMenuClickHandlers();
-    restrictUnauthorizedURLs();
-    setupHeaderScroll(); // Nueva función para manejar el scroll del header
-    setupMobileIcons(); // Nueva función para manejar íconos y submenús móviles
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const user = await fetchUserProfile(); // Configura el header y devuelve el usuario si está autenticado
+        if (user) {
+            await fetchNotifications(); // Solo cargar notificaciones si hay una sesión activa
+        }
+        highlightSelectedMenuItem();
+        setupMenuClickHandlers();
+        restrictUnauthorizedURLs();
+        setupHeaderScroll();
+    } catch (error) {
+        console.error('Error during DOM load:', error);
+    }
 });
+
+async function fetchNotifications() {
+    const notificationsList = document.getElementById('notifications-list');
+    if (!notificationsList) {
+        console.log('Notifications list not found on this page');
+        return;
+    }
+    try {
+        const response = await fetch('/sphere/api/get_notifications.php', {
+            credentials: 'include'
+        });
+        if (!response.ok) throw new Error('Failed to fetch notifications');
+        
+        const data = await response.json();
+        
+        if (data.success && data.notifications?.length) {
+            notificationsList.innerHTML = data.notifications.map(notif => `
+                <div class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-b ${
+                    notif.is_read ? '' : 'font-bold bg-gray-50'
+                }" data-notification-id="${notif.id}">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span>${notif.message}</span>
+                            <span class="text-xs text-gray-500 block">${new Date(notif.timestamp).toLocaleString()}</span>
+                        </div>
+                        <button class="toggle-read-btn text-xs ${
+                            notif.is_read ? 'text-blue-500' : 'text-gray-500'
+                        }" title="${notif.is_read ? 'Mark as unread' : 'Mark as read'}">
+                            <ion-icon name="${notif.is_read ? 'eye-off-outline' : 'eye-outline'}" class="ml-2" size="small"></ion-icon>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Agregar manejadores para alternar estado de leído/no leído
+            notificationsList.querySelectorAll('.toggle-read-btn').forEach(btn => {
+                btn.addEventListener('click', async function(e) {
+                    e.stopPropagation();
+                    const notificationDiv = this.closest('[data-notification-id]');
+                    const notificationId = notificationDiv.dataset.notificationId;
+                    const currentState = !notificationDiv.classList.contains('font-bold');
+                    const newState = !currentState;
+                
+                    this.disabled = true;
+                    this.innerHTML = '<ion-icon name="refresh-outline" class="animate-spin"></ion-icon>';
+                
+                    const success = await toggleNotificationRead(notificationId, newState);
+                    
+                    if (success) {
+                        notificationDiv.classList.toggle('font-bold', !newState);
+                        notificationDiv.classList.toggle('bg-gray-50', !newState);
+                        this.classList.toggle('text-blue-500', newState);
+                        this.classList.toggle('text-gray-500', !newState);
+                        this.querySelector('ion-icon').setAttribute('name', 
+                            newState ? 'eye-off-outline' : 'eye-outline');
+                        this.setAttribute('title', 
+                            newState ? 'Mark as unread' : 'Mark as read');
+                    }
+                    
+                    this.disabled = false;
+                    this.innerHTML = `<ion-icon name="${newState ? 'eye-off-outline' : 'eye-outline'}" class="ml-2" size="small"></ion-icon>`;
+                });
+            });
+        } else {
+            notificationsList.innerHTML = `
+                <div class="px-4 py-2 text-sm text-gray-500">
+                    No new notifications
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error fetching notifications:', error);
+        notificationsList.innerHTML = `
+            <div class="px-4 py-2 text-sm text-gray-500">
+                Unable to load notifications
+            </div>
+        `;
+    }
+}
+
+async function toggleNotificationRead(notificationId, isRead) {
+    try {
+        const response = await fetch('/sphere/api/mark_notification_read.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                notification_id: notificationId,
+                is_read: isRead ? 1 : 0 
+            })
+        });
+        
+        const data = await response.json();
+        if (!data.success) {
+            throw new Error(data.message);
+        }
+        return true;
+    } catch (error) {
+        console.error('Error toggling notification read status:', error);
+        return false;
+    }
+}
 
 async function fetchUserProfile() {
     try {
-        const response = await fetch('/sphere/api/get_user.php');
+        const response = await fetch('/sphere/api/get_user.php', {
+            credentials: 'include'
+        });
         const profileHeader = document.getElementById('user-profile');
         const profileLink = document.querySelector('.profile-link');
         const notifyLink = document.querySelector('.notify-link');
+        const notifyHeader = document.getElementById('user-notify');
         const newPostLink = document.querySelector('.new_post-link');
         const loginLink = document.querySelector('.login-link');
         const registerLink = document.querySelector('.register-link');
@@ -24,7 +134,6 @@ async function fetchUserProfile() {
         const data = await response.json();
         const user = data.success && data.usuario?.length ? data.usuario[0] : null;
 
-        // Agregar botón de menú después del logo
         if (logoContainer) {
             logoContainer.innerHTML = `
                 <a href="/sphere/index.html"><h1 class="text-2xl font-bold text-gray-800">Sphere</h1></a>
@@ -32,16 +141,17 @@ async function fetchUserProfile() {
                     <ion-icon name="menu-outline" class="text-2xl"></ion-icon>
                 </button>
             `;
-            setupMenuToggle(); // Llamar después de agregar el botón
+            setupMenuToggle();
         }
 
-        if (user) {
+        if (user && profileHeader) {
+            const userNameSlug = (user.nombre + '-' + (user.apellido || '')).toLowerCase().replace(/\s+/g, '-');
             profileHeader.innerHTML = `
-                <a href="/sphere/profile.html" class="user-profile-link flex items-center space-x-2">
+                <a href="/sphere/profile.html?user=${user.id}-${userNameSlug}" class="user-profile-link flex items-center space-x-2">
                     <img src="${user.foto_perfil || '/sphere/images/profile/default-avatar.png'}" alt="${user.nombre}" class="w-8 h-8 rounded-full object-cover">
                 </a>
                 <ul class="sub-menu absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-40 hidden">
-                    <li><a href="/sphere/profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">${user.nombre} - Ver perfil</a></li>
+                    <li><a href="/sphere/profile.html?user=${user.id}-${userNameSlug}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">${user.nombre} - Ver perfil</a></li>
                     <li><a href="/sphere/change_password.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Cambiar contraseña</a></li>
                     <li><a href="/sphere/api/logout.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Cerrar sesión</a></li>
                 </ul>
@@ -52,7 +162,15 @@ async function fetchUserProfile() {
             if (loginLink) loginLink.classList.add('hidden');
             if (registerLink) registerLink.classList.add('hidden');
             if (logoutLink) logoutLink.classList.add('hidden');
-        } else {
+
+            const notifySubMenu = notifyLink.querySelector('.notify-sub-menu');
+            if (notifyHeader && notifySubMenu) {
+                notifyHeader.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    notifySubMenu.classList.toggle('hidden');
+                });
+            }
+        } else if (profileHeader) {
             profileHeader.innerHTML = '<a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800 text-sm">Iniciar sesión</a>';
             if (profileLink) profileLink.classList.add('hidden');
             if (notifyLink) notifyLink.classList.add('hidden');
@@ -70,34 +188,27 @@ async function fetchUserProfile() {
                 subMenu.classList.toggle('hidden');
             });
         }
+
+        return user;
     } catch (error) {
-        console.error('Error fetching user profile:', error);
+        console.error('Error fetching user profile in script.js:', error);
         const profileHeader = document.getElementById('user-profile');
-        const profileLink = document.querySelector('.profile-link');
-        const notifyLink = document.querySelector('.notify-link');
-        const newPostLink = document.querySelector('.new_post-link');
-        const loginLink = document.querySelector('.login-link');
-        const registerLink = document.querySelector('.register-link');
-        const logoutLink = document.querySelector('.logout-link');
-        const logoContainer = document.querySelector('.logo');
-
-        if (logoContainer) {
-            logoContainer.innerHTML = `
-                <a href="/sphere/index.html"><h1 class="text-2xl font-bold text-gray-800">Sphere</h1></a>
-                <button class="menu-toggle md:hidden text-gray-600 hover:text-gray-800 focus:outline-none flex items-end">
-                    <ion-icon name="menu-outline" class="text-2xl"></ion-icon>
-                </button>
-            `;
-            setupMenuToggle(); // Llamar después de agregar el botón
+        if (profileHeader) {
+            profileHeader.innerHTML = '<a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800 text-sm">Iniciar sesión</a>';
+            const profileLink = document.querySelector('.profile-link');
+            const notifyLink = document.querySelector('.notify-link');
+            const newPostLink = document.querySelector('.new_post-link');
+            const loginLink = document.querySelector('.login-link');
+            const registerLink = document.querySelector('.register-link');
+            const logoutLink = document.querySelector('.logout-link');
+            if (profileLink) profileLink.classList.add('hidden');
+            if (notifyLink) notifyLink.classList.add('hidden');
+            if (newPostLink) newPostLink.classList.add('hidden');
+            if (loginLink) loginLink.classList.remove('hidden');
+            if (registerLink) registerLink.classList.remove('hidden');
+            if (logoutLink) logoutLink.classList.add('hidden');
         }
-
-        profileHeader.innerHTML = '<a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800 text-sm">Iniciar sesión</a>';
-        if (profileLink) profileLink.classList.add('hidden');
-        if (notifyLink) notifyLink.classList.add('hidden');
-        if (newPostLink) newPostLink.classList.add('hidden');
-        if (loginLink) loginLink.classList.remove('hidden');
-        if (registerLink) registerLink.classList.remove('hidden');
-        if (logoutLink) logoutLink.classList.add('hidden');
+        return null;
     }
 }
 
@@ -135,7 +246,7 @@ function restrictUnauthorizedURLs() {
     const validPaths = [
         '/sphere/index.html', '/sphere/profile.html', '/sphere/new_post.html',
         '/sphere/notify.html', '/sphere/trending.html', '/sphere/explorer.html',
-        '/sphere/all_posts.html', '/sphere/login.html', '/sphere/register.html',
+        '/sphere/all_posts.html', '/sphere/post.html', '/sphere/login.html', '/sphere/register.html',
         '/sphere/change_password.html', '/sphere/edit_post.html'
     ];
     const currentPath = window.location.pathname;
@@ -166,7 +277,6 @@ function setupMenuToggle() {
     }
 }
 
-// Nueva función para manejar el scroll del header
 function setupHeaderScroll() {
     const header = document.querySelector('header');
     let lastScroll = 0;
@@ -176,93 +286,33 @@ function setupHeaderScroll() {
             const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
             if (currentScroll < lastScroll) {
-                // Scroll hacia arriba: mostrar el header
                 header.classList.remove('-translate-y-full');
                 header.classList.add('translate-y-0');
             } else if (currentScroll > lastScroll) {
-                // Scroll hacia abajo: ocultar el header
                 header.classList.remove('translate-y-0');
                 header.classList.add('-translate-y-full');
             }
 
-            lastScroll = currentScroll <= 0 ? 0 : currentScroll; // Evitar valores negativos
+            lastScroll = currentScroll <= 0 ? 0 : currentScroll;
         });
-    }
-}
-
-// Nueva función para manejar íconos y submenús móviles
-function setupMobileIcons() {
-    const searchIcon = document.querySelector('.search-icon');
-    const newPostIcon = document.querySelector('.new-post-icon');
-    const notifyIcon = document.querySelector('.notify-icon');
-    const searchSubmenu = document.querySelector('.search-submenu');
-    const notifySubmenu = document.querySelector('.notify-submenu');
-
-    if (window.innerWidth < 768) {
-        // Mostrar íconos y ocultar elementos de texto en pantallas pequeñas
-        document.querySelector('.search-div').classList.add('hidden');
-        document.querySelector('.new_post-link a').classList.add('hidden');
-        document.querySelector('.notify-link a').classList.add('hidden');
-        searchIcon.classList.remove('hidden');
-        newPostIcon.classList.remove('hidden');
-        notifyIcon.classList.remove('hidden');
-
-        // Manejar clic en el ícono de búsqueda
-        if (searchIcon && searchSubmenu) {
-            searchIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                searchSubmenu.classList.toggle('active');
-                if (notifySubmenu) notifySubmenu.classList.remove('active'); // Cerrar notify si está abierto
-            });
-        }
-
-        // Manejar clic en el ícono de "New Post"
-        if (newPostIcon) {
-            newPostIcon.addEventListener('click', () => {
-                window.location.href = '/sphere/new_post.html';
-            });
-        }
-
-        // Manejar clic en el ícono de notificaciones
-        if (notifyIcon && notifySubmenu) {
-            notifyIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                notifySubmenu.classList.toggle('active');
-                if (searchSubmenu) searchSubmenu.classList.remove('active'); // Cerrar search si está abierto
-            });
-        }
-
-        // Cerrar submenús al hacer clic fuera
-        document.addEventListener('click', (event) => {
-            if (!searchSubmenu.contains(event.target) && !searchIcon.contains(event.target)) {
-                searchSubmenu.classList.remove('active');
-            }
-            if (!notifySubmenu.contains(event.target) && !notifyIcon.contains(event.target)) {
-                notifySubmenu.classList.remove('active');
-            }
-        });
-
-        // Manejar búsqueda en el submenú
-        const searchInput = searchSubmenu.querySelector('.search-input');
-        const searchButton = searchSubmenu.querySelector('button');
-        if (searchInput && searchButton) {
-            searchButton.addEventListener('click', () => {
-                const query = searchInput.value.trim();
-                if (query) {
-                    alert(`Searching for: ${query}`); // Simulación, puedes reemplazar con una API real
-                    searchSubmenu.classList.remove('active'); // Cerrar después de buscar
-                }
-            });
-        }
     }
 }
 
 document.addEventListener('click', (event) => {
     const subMenus = document.querySelectorAll('.sub-menu');
+    const notifySubMenus = document.querySelectorAll('.notify-sub-menu');
+    
     subMenus.forEach(subMenu => {
         const profileLink = subMenu.previousElementSibling;
         if (!subMenu.contains(event.target) && !profileLink.contains(event.target)) {
             subMenu.classList.add('hidden');
+        }
+    });
+    
+    notifySubMenus.forEach(notifySubMenu => {
+        const notifyLink = notifySubMenu.previousElementSibling;
+        if (!notifySubMenu.contains(event.target) && !notifyLink.contains(event.target)) {
+            notifySubMenu.classList.add('hidden');
         }
     });
 });

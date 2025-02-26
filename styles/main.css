@@ -69,7 +69,7 @@
                 transform: translateX(0);
             }
             /* Submenús en pantallas pequeñas */
-            .search-submenu, .notify-submenu {
+            .search-submenu {
                 position: absolute;
                 top: 100%;
                 right: 0;
@@ -83,13 +83,13 @@
                 overflow-y: auto;
                 display: none;
             }
-            .search-submenu.active, .notify-submenu.active {
+            .search-submenu.active {
                 display: block;
             }
-            .new-post-icon, .search-icon, .notify-icon {
+            .new-post-icon, .search-icon {
                 display: block; /* Aseguramos que los íconos sean visibles */
             }
-            .search-div, .new_post-link a, .notify-link a {
+            .search-div, .new_post-link a {
                 display: none; /* Ocultar elementos de texto en pantallas pequeñas */
             }
             .search-input {
@@ -109,13 +109,13 @@
             }
         }
         @media (min-width: 768px) {
-            .search-icon, .new-post-icon, .notify-icon {
+            .search-icon, .new-post-icon {
                 display: none !important; /* Ocultar íconos en pantallas grandes */
             }
             .search-div {
                 display: block;
             }
-            .new_post-link a, .notify-link a {
+            .new_post-link a {
                 display: block;
             }
         }

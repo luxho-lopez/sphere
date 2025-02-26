@@ -1,162 +1,103 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('DOM loaded, starting profile load');
+    console.log('DOM loaded in profile.js, starting profile load');
     try {
-        const user = await fetchUserProfile();
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const userParam = urlParams.get('user');
+        const currentUserId = await getCurrentUserId();
+        let userId;
+
+        if (userParam) {
+            const [idPart] = userParam.split('-');
+            userId = idPart;
+            console.log('Extracted userId from URL:', userId);
+        }
+
+        if (!userId && !currentUserId) {
+            console.warn('No user provided and no active session, redirecting to index.html');
+            window.location.href = '/sphere/index.html';
+            return;
+        }
+
+        if (!userId && currentUserId) {
+            console.log('No user provided in URL, using current user ID:', currentUserId);
+            userId = currentUserId;
+        }
+
+        const user = await fetchProfileById(userId);
         if (user) {
             await fetchUserPosts(user.id);
         }
         console.log('Profile load completed');
     } catch (error) {
         console.error('Error loading profile:', error);
-        window.location.href = '/login.html';
+        const profileSection = document.getElementById('profile');
+        if (profileSection) {
+            profileSection.innerHTML = '<p class="text-center text-gray-500">Error loading profile or user not found.</p>';
+        }
     }
 });
 
-async function fetchUserProfile() {
+async function fetchProfileById(userId) {
     const profileSection = document.getElementById('profile');
-    const profileHeader = document.getElementById('user-profile');
-    const profileLink = document.querySelector('.profile-link');
-    const notifyLink = document.querySelector('.notify-link');
-    const newPostLink = document.querySelector('.new_post-link');
-    const loginLink = document.querySelector('.login-link');
-    const registerLink = document.querySelector('.register-link');
-    const logoContainer = document.querySelector('.logo');
-
     if (!profileSection) {
         console.error('Profile section not found');
         throw new Error('Profile section not found in DOM');
     }
 
     try {
-        const response = await fetch('/sphere/api/get_user.php');
+        const response = await fetch(`/sphere/api/get_user_by_id.php?userId=${userId}`, {
+            credentials: 'include'
+        });
         const data = await response.json();
 
-        if (!data.success || !data.usuario?.length) {
+        if (!response.ok || !data.success || !data.usuario) {
             throw new Error(data.message || 'No user data');
         }
 
-        const user = data.usuario[0];
-
-        // Agregar botón de menú después del logo
-        if (logoContainer) {
-            logoContainer.innerHTML = `
-                <a href="/sphere/index.html"><h1 class="text-2xl font-bold text-gray-800">Sphere</h1></a>
-                <button class="menu-toggle md:hidden text-gray-600 hover:text-gray-800 focus:outline-none flex items-end">
-                    <ion-icon name="menu-outline" class="text-2xl"></ion-icon>
-                </button>
-            `;
-            setupMenuToggle(); // Configurar el toggle después de agregar el botón
-        }
-
-        // Actualizar header según autenticación
-        if (profileHeader) {
-            profileHeader.innerHTML = `
-                <a href="/sphere/profile.html" class="user-profile-link flex items-center space-x-2">
-                    <img src="${user.foto_perfil || '/sphere/images/profile/default-avatar.png'}" alt="${user.nombre}" class="w-8 h-8 rounded-full object-cover">
-                </a>
-                <ul class="sub-menu absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-50 hidden">
-                    <li><a href="/sphere/profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">${user.nombre} - Ver perfil</a></li>
-                    <li><a href="/sphere/change_password.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Cambiar contraseña</a></li>
-                    <li><a href="/sphere/api/logout.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Cerrar sesión</a></li>
-                </ul>
-            `;
-            if (profileLink) profileLink.classList.remove('hidden');
-            if (notifyLink) notifyLink.classList.remove('hidden');
-            if (newPostLink) newPostLink.classList.remove('hidden');
-            if (loginLink) loginLink.classList.add('hidden');
-            if (registerLink) registerLink.classList.add('hidden');
-        }
+        const user = data.usuario;
 
         profileSection.innerHTML = `
-        <div class="mb-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-colors duration-200">
-            <div class="relative h-48">
-                <img src="https://res.cloudinary.com/djv4xa6wu/image/upload/v1735722161/AbhirajK/Abhirajk2.webp" alt="Cover" class="w-full h-full object-cover">
-                <div class="absolute -bottom-12 left-6">
-                <img src="${user.foto_perfil || '/sphere/images/profile/default-avatar.png'}" alt="${user.nombre}" class="w-24 h-24 rounded-xl object-cover border-4 border-white dark:border-gray-800 shadow-lg">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-colors duration-200">
+                <div class="relative h-48">
+                    <img src="https://res.cloudinary.com/djv4xa6wu/image/upload/v1735722161/AbhirajK/Abhirajk2.webp" alt="Cover" class="w-full h-full object-cover">
+                    <div class="absolute -bottom-12 left-6">
+                        <img src="${user.foto_perfil || '/sphere/images/profile/default-avatar.png'}" alt="${user.nombre}" class="w-24 h-24 rounded-xl object-cover border-4 border-white dark:border-gray-800 shadow-lg">
+                    </div>
                 </div>
-            </div>
-
-            <div class="pt-16 px-6 pb-6">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">${user.nombre} ${user.apellido}K</h1>
-                    <p class="text-purple-600 dark:text-purple-400">Node.js Developer & Frontend Expert</p>
+                <div class="pt-16 px-6 pb-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">${user.nombre} ${user.apellido || ''}</h1>
+                            <p class="text-purple-600 dark:text-purple-400">Sphere User</p>
+                        </div>
+                        <a href="#" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium">
+                            View Profile
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                        </a>
+                    </div>
+                    <p class="mt-6 text-gray-600 dark:text-gray-300">
+                        Hi, I'm a member of the Sphere community. Check out my posts below!
+                    </p>
+                    <div class="mt-6">
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Contact</h2>
+                        <a href="mailto:${user.correo}" class="inline-flex items-center text-purple-600 dark:text-purple-400 hover:underline">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            ${user.correo}
+                        </a>
+                    </div>
                 </div>
-                <a 
-                    href="https://abhirajk.vercel.app/" 
-                    target="_blank"
-                    class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium"
-                >
-                    View Portfolio
-                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                    </svg>
-                </a>
-                </div>
-
-                <p class="mt-6 text-gray-600 dark:text-gray-300">
-                Hi, I'm a passionate developer with expertise in Node.js, React, and Tailwind CSS. I love building efficient and scalable web applications.
-                </p>
-
-                <div class="mt-6">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Skills</h2>
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-lg text-sm font-medium">Node.js</span>
-                    <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-lg text-sm font-medium">React</span>
-                    <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-lg text-sm font-medium">Tailwind CSS</span>
-                    <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-lg text-sm font-medium">MySQL</span>
-                </div>
-                </div>
-
-                <div class="mt-6">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Contact</h2>
-                <a 
-                    href="mailto:abhirajk@example.com" 
-                    class="inline-flex items-center text-purple-600 dark:text-purple-400 hover:underline"
-                >
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
-                    ${user.correo}
-                </a>
-                </div>
-            </div>
             </div>
         `;
-
-        const profileLinkElement = profileHeader.querySelector('.user-profile-link');
-        const subMenu = profileHeader.querySelector('.sub-menu');
-        if (profileLinkElement && subMenu) {
-            profileLinkElement.addEventListener('click', (e) => {
-                e.preventDefault();
-                subMenu.classList.toggle('hidden');
-            });
-        }
 
         return user;
     } catch (error) {
         console.error('Error fetching user profile:', error);
-
-        // Caso de error: mostrar solo "Log In" en el header
-        if (profileHeader) {
-            profileHeader.innerHTML = '<a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800 text-sm">Iniciar sesión</a>';
-            if (profileLink) profileLink.classList.add('hidden');
-            if (notifyLink) notifyLink.classList.add('hidden');
-            if (newPostLink) newPostLink.classList.add('hidden');
-            if (loginLink) loginLink.classList.remove('hidden');
-            if (registerLink) registerLink.classList.remove('hidden');
-        }
-
-        if (logoContainer) {
-            logoContainer.innerHTML = `
-                <a href="/sphere/index.html"><h1 class="text-2xl font-bold text-gray-800">Sphere</h1></a>
-                <button class="menu-toggle md:hidden text-gray-600 hover:text-gray-800 focus:outline-none flex items-end">
-                    <ion-icon name="menu-outline" class="text-2xl"></ion-icon>
-                </button>
-            `;
-            setupMenuToggle();
-        }
-
         throw error;
     }
 }
@@ -178,7 +119,7 @@ async function fetchUserPosts(userId) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const posts = await response.json();
-        const userPosts = posts.filter(post => post.usuario_id == userId);
+        const userPosts = posts.filter(post => parseInt(post.usuario_id) === parseInt(userId));
 
         postsContainer.innerHTML = '';
         for (const [index, post] of userPosts.entries()) {
@@ -202,13 +143,14 @@ async function fetchUserPosts(userId) {
         }
     } catch (error) {
         console.error('Error fetching user posts:', error);
+        postsContainer.innerHTML = '<p class="text-center text-gray-500">No posts found or error loading posts.</p>';
     }
 }
 
 async function createPostElement(post, index) {
     const postElement = document.createElement('div');
     postElement.className = 'bg-white shadow-md rounded-lg p-6 mb-6 relative';
-    const truncatedContent = truncateContent(post.contenido, 50);
+    const truncatedContent = truncateContent(post.contenido, 15);
     const images = createImageCarousel(post.images, post.titulo, index);
     const commentsList = post.comments || [];
     const visibleComments = commentsList.slice(0, 2);
@@ -216,11 +158,12 @@ async function createPostElement(post, index) {
     const currentUserId = await getCurrentUserId();
     const postUserId = parseInt(post.usuario_id);
     const commentsHTML = visibleComments.map(comment => createCommentHTML(comment, currentUserId)).join('');
+    const userNameSlug = (post.author.name + '-' + (post.author.lastname || '')).toLowerCase().replace(/\s+/g, '-');
 
     postElement.innerHTML = `
         <div class="flex justify-between items-center mb-4">
             <div class="flex items-center space-x-3">
-                <a href="#" class="flex items-center space-x-2">
+                <a href="/sphere/profile.html?user=${postUserId}-${userNameSlug}" class="flex items-center space-x-2">
                     <img src="${post.author.foto_perfil || '/sphere/images/profile/default-avatar.png'}" class="w-8 h-8 rounded-full object-cover">
                     <span class="text-gray-800 font-medium">${post.author.name} ${post.author.lastname}</span>
                     <span class="text-gray-500 text-xs">${new Date(post.fecha_publicacion).toLocaleDateString()}</span>
@@ -229,7 +172,7 @@ async function createPostElement(post, index) {
             <div class="relative z-10">
                 <ion-icon name="ellipsis-vertical-outline" class="text-gray-600 cursor-pointer submenu-toggle"></ion-icon>
                 <div class="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg submenu z-20 hidden">
-                    ${postUserId === currentUserId ? `
+                    ${postUserId === currentUserId && currentUserId !== 0 ? `
                         <button class="edit-post-btn block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Edit Post</button>
                         <button class="delete-post-btn block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Delete Post</button>
                     ` : '<span class="block px-4 py-2 text-gray-700">No actions available</span>'}
@@ -239,8 +182,8 @@ async function createPostElement(post, index) {
         <div class="mb-4">
             ${images}
             <div class="mt-3">
-                <h3 class="text-lg font-semibold text-gray-800">${post.titulo}</h3>
-                <p class="post-content text-gray-600 text-sm mt-1">${truncatedContent}</p>
+                <h3 class="text-lg font-semibold text-gray-800 cursor-pointer hover:text-blue-500">${post.titulo}</h3>
+                <p class="post-content text-gray-600 text-sm mt-1 cursor-pointer hover:text-blue-500">${truncatedContent}</p>
                 <button class="read-more-btn text-blue-500 hover:underline text-sm mt-2">Read More</button>
             </div>
         </div>
@@ -265,6 +208,16 @@ async function createPostElement(post, index) {
             </div>
         </div>
     `;
+
+    // Modal handlers
+    const title = postElement.querySelector('h3');
+    const content = postElement.querySelector('.post-content');
+    [title, content].forEach(element => {
+        element.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPostModal(post);
+        });
+    });
 
     const reactionBtn = postElement.querySelector('.reaction-btn');
     if (reactionBtn) reactionBtn.addEventListener('click', () => handleLike(post, postElement));
@@ -306,6 +259,68 @@ async function createPostElement(post, index) {
     return postElement;
 }
 
+// Función para mostrar el modal
+function showPostModal(post) {
+    let modal = document.getElementById('post-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'post-modal';
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden';
+        document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl h-full max-h-[90vh] overflow-y-auto relative">
+            <button id="close-modal-btn" class="absolute top-2 right-2 text-gray-600 hover:text-gray-800">
+                <ion-icon name="close-outline" class="text-2xl"></ion-icon>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">${post.titulo}</h2>
+            ${createImageCarousel(post.images, post.titulo, 'modal')}
+            <p class="text-gray-600 mt-4">${post.contenido}</p>
+            <div class="flex items-center justify-between text-sm text-gray-500 mt-4">
+                <span>By ${post.author.name} ${post.author.lastname}</span>
+                <span>${new Date(post.fecha_publicacion).toLocaleDateString()}</span>
+            </div>
+            <div class="mt-4 flex items-center space-x-4">
+                <button class="reaction-btn flex items-center space-x-1 text-gray-600 hover:text-blue-500" data-post-id="${post.id}">
+                    <ion-icon name="${post.user_liked ? 'heart' : 'heart-outline'}" class="text-xl" style="color: ${post.user_liked ? 'green' : 'gray'};"></ion-icon>
+                    <span class="like-count">${post.like_count}</span>
+                </button>
+            </div>
+        </div>
+    `;
+
+    modal.classList.remove('hidden');
+
+    if (post.images && post.images.length >= 2) {
+        new Swiper('#swiper-container-modal', {
+            loop: true,
+            pagination: { el: '#swiper-container-modal .swiper-pagination', clickable: true },
+            navigation: {
+                nextEl: '#swiper-container-modal .swiper-button-next',
+                prevEl: '#swiper-container-modal .swiper-button-prev'
+            },
+            slidesPerView: 1,
+            slidesPerGroup: 1
+        });
+    }
+
+    const closeBtn = modal.querySelector('#close-modal-btn');
+    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+    });
+
+    const modalReactionBtn = modal.querySelector('.reaction-btn');
+    if (modalReactionBtn) {
+        modalReactionBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleLike(post, modal);
+        });
+    }
+}
+
 document.addEventListener('click', (event) => {
     const submenus = document.querySelectorAll('.submenu');
     submenus.forEach(submenu => {
@@ -318,7 +333,7 @@ document.addEventListener('click', (event) => {
 
 function createCommentHTML(comment, currentUserId) {
     return `
-        <div class="comment flex items-start space-x-2" data-comment-id="${comment.id}">
+        <div class="comment flex items-start space-x-2 border-b" data-comment-id="${comment.id}">
             <p class="text-gray-600 text-sm">${comment.contenido} <span class="text-gray-500 text-xs">- ${comment.user_name} (${new Date(comment.fecha_creacion).toLocaleString()})</span>
                 ${comment.user_id === currentUserId ? `
                     <button class="edit-comment-btn text-blue-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Edit</button>
@@ -470,29 +485,29 @@ function updateViewMoreButton(postElement, postId) {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
     })
-        .then(response => response.json())
-        .then(posts => {
-            const post = posts.find(p => p.id === postId);
-            if (post) {
-                const commentsList = postElement.querySelector('.comments-list');
-                const visibleComments = commentsList ? commentsList.querySelectorAll('.comment').length : 0;
-                const totalComments = post.comments.length;
+    .then(response => response.json())
+    .then(posts => {
+        const post = posts.find(p => p.id === postId);
+        if (post) {
+            const commentsList = postElement.querySelector('.comments-list');
+            const visibleComments = commentsList ? commentsList.querySelectorAll('.comment').length : 0;
+            const totalComments = post.comments.length;
 
-                if (totalComments > 2) {
-                    let viewMoreBtn = postElement.querySelector('.view-more-comments-btn');
-                    if (!viewMoreBtn) {
-                        viewMoreBtn = document.createElement('button');
-                        viewMoreBtn.className = 'view-more-comments-btn text-blue-500 hover:underline text-sm mt-2';
-                        const commentsSection = postElement.querySelector('.comments-section');
-                        if (commentsSection) commentsSection.appendChild(viewMoreBtn);
-                    }
-                    viewMoreBtn.textContent = `View More Comments (${totalComments - visibleComments})`;
-                    viewMoreBtn.style.display = 'block';
-                    viewMoreBtn.addEventListener('click', () => expandComments(post, postElement, currentUserId));
+            if (totalComments > 2) {
+                let viewMoreBtn = postElement.querySelector('.view-more-comments-btn');
+                if (!viewMoreBtn) {
+                    viewMoreBtn = document.createElement('button');
+                    viewMoreBtn.className = 'view-more-comments-btn text-blue-500 hover:underline text-sm mt-2';
+                    const commentsSection = postElement.querySelector('.comments-section');
+                    if (commentsSection) commentsSection.appendChild(viewMoreBtn);
                 }
+                viewMoreBtn.textContent = `View More Comments (${totalComments - visibleComments})`;
+                viewMoreBtn.style.display = 'block';
+                viewMoreBtn.addEventListener('click', () => expandComments(post, postElement, getCurrentUserId()));
             }
-        })
-        .catch(error => console.error('Error fetching updated comments:', error));
+        }
+    })
+    .catch(error => console.error('Error fetching updated comments:', error));
 }
 
 async function getCurrentUserId() {
@@ -517,9 +532,14 @@ async function getCurrentUserId() {
 }
 
 async function getCurrentUserName() {
-    const response = await fetch('/sphere/api/get_user.php');
-    const data = await response.json();
-    return data.success && data.usuario?.length ? data.usuario[0].nombre : 'Unknown';
+    try {
+        const response = await fetch('/sphere/api/get_user.php');
+        const data = await response.json();
+        return data.success && data.usuario?.length ? data.usuario[0].nombre : 'Unknown';
+    } catch (error) {
+        console.error('Error getting current user name:', error);
+        return 'Unknown';
+    }
 }
 
 function truncateContent(content, wordLimit) {
