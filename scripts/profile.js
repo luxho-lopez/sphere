@@ -1,42 +1,44 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded in profile.js, starting profile load');
-    try {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const userParam = urlParams.get('user');
-        const currentUserId = await getCurrentUserId();
-        let userId;
+    (async () => {
+        try {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const userParam = urlParams.get('user');
+            const currentUserId = await getCurrentUserId();
+            let userId;
 
-        if (userParam) {
-            const [idPart] = userParam.split('-');
-            userId = idPart;
-            console.log('Extracted userId from URL:', userId);
-        }
+            if (userParam) {
+                const [idPart] = userParam.split('-');
+                userId = idPart;
+                console.log('Extracted userId from URL:', userId);
+            }
 
-        if (!userId && !currentUserId) {
-            console.warn('No user provided and no active session, redirecting to index.html');
-            window.location.href = '/sphere/index.html';
-            return;
-        }
+            if (!userId && !currentUserId) {
+                console.warn('No user provided and no active session, redirecting to index.html');
+                window.location.href = '/sphere/index.html';
+                return;
+            }
 
-        if (!userId && currentUserId) {
-            console.log('No user provided in URL, using current user ID:', currentUserId);
-            userId = currentUserId;
-        }
+            if (!userId && currentUserId) {
+                console.log('No user provided in URL, using current user ID:', currentUserId);
+                userId = currentUserId;
+            }
 
-        const user = await fetchProfileById(userId);
-        if (user) {
-            await fetchUserPosts(user.id);
+            const user = await fetchProfileById(userId);
+            if (user) {
+                await fetchUserPosts(user.id);
+            }
+            console.log('Profile load completed');
+        } catch (error) {
+            console.error('Error loading profile:', error);
+            const profileSection = document.getElementById('profile');
+            if (profileSection) {
+                profileSection.innerHTML = '<p class="text-center text-gray-500">Error loading profile or user not found.</p>';
+            }
         }
-        console.log('Profile load completed');
-    } catch (error) {
-        console.error('Error loading profile:', error);
-        const profileSection = document.getElementById('profile');
-        if (profileSection) {
-            profileSection.innerHTML = '<p class="text-center text-gray-500">Error loading profile or user not found.</p>';
-        }
-    }
+    })();
 });
 
 async function fetchProfileById(userId) {
@@ -52,24 +54,24 @@ async function fetchProfileById(userId) {
         });
         const data = await response.json();
 
-        if (!response.ok || !data.success || !data.usuario) {
+        if (!response.ok || !data.success || !data.user) {
             throw new Error(data.message || 'No user data');
         }
 
-        const user = data.usuario;
+        const user = data.user;
 
         profileSection.innerHTML = `
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-colors duration-200">
                 <div class="relative h-48">
                     <img src="https://res.cloudinary.com/djv4xa6wu/image/upload/v1735722161/AbhirajK/Abhirajk2.webp" alt="Cover" class="w-full h-full object-cover">
                     <div class="absolute -bottom-12 left-6">
-                        <img src="${user.foto_perfil || '/sphere/images/profile/default-avatar.png'}" alt="${user.nombre}" class="w-24 h-24 rounded-xl object-cover border-4 border-white dark:border-gray-800 shadow-lg">
+                        <img src="${user.profile_picture || '/sphere/images/profile/default-avatar.png'}" alt="${user.first_name}" class="w-24 h-24 rounded-xl object-cover border-4 border-white dark:border-gray-800 shadow-lg">
                     </div>
                 </div>
                 <div class="pt-16 px-6 pb-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">${user.nombre} ${user.apellido || ''}</h1>
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">${user.first_name} ${user.last_name || ''}</h1>
                             <p class="text-purple-600 dark:text-purple-400">Sphere User</p>
                         </div>
                         <a href="#" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium">
@@ -84,11 +86,11 @@ async function fetchProfileById(userId) {
                     </p>
                     <div class="mt-6">
                         <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Contact</h2>
-                        <a href="mailto:${user.correo}" class="inline-flex items-center text-purple-600 dark:text-purple-400 hover:underline">
+                        <a href="mailto:${user.email}" class="inline-flex items-center text-purple-600 dark:text-purple-400 hover:underline">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                             </svg>
-                            ${user.correo}
+                            ${user.email}
                         </a>
                     </div>
                 </div>
@@ -119,7 +121,7 @@ async function fetchUserPosts(userId) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const posts = await response.json();
-        const userPosts = posts.filter(post => parseInt(post.usuario_id) === parseInt(userId));
+        const userPosts = posts.filter(post => parseInt(post.user_id) === parseInt(userId));
 
         postsContainer.innerHTML = '';
         for (const [index, post] of userPosts.entries()) {
@@ -150,23 +152,23 @@ async function fetchUserPosts(userId) {
 async function createPostElement(post, index) {
     const postElement = document.createElement('div');
     postElement.className = 'bg-white shadow-md rounded-lg p-6 mb-6 relative';
-    const truncatedContent = truncateContent(post.contenido, 15);
-    const images = createImageCarousel(post.images, post.titulo, index);
+    const truncatedContent = truncateContent(post.content, 50);
+    const images = createImageCarousel(post.images, post.title, index);
     const commentsList = post.comments || [];
     const visibleComments = commentsList.slice(0, 2);
     const hasMoreComments = commentsList.length > 2;
     const currentUserId = await getCurrentUserId();
-    const postUserId = parseInt(post.usuario_id);
+    const postUserId = parseInt(post.user_id);
     const commentsHTML = visibleComments.map(comment => createCommentHTML(comment, currentUserId)).join('');
-    const userNameSlug = (post.author.name + '-' + (post.author.lastname || '')).toLowerCase().replace(/\s+/g, '-');
+    const userNameSlug = (post.author.first_name + '-' + (post.author.last_name || '')).toLowerCase().replace(/\s+/g, '-');
 
     postElement.innerHTML = `
         <div class="flex justify-between items-center mb-4">
             <div class="flex items-center space-x-3">
                 <a href="/sphere/profile.html?user=${postUserId}-${userNameSlug}" class="flex items-center space-x-2">
-                    <img src="${post.author.foto_perfil || '/sphere/images/profile/default-avatar.png'}" class="w-8 h-8 rounded-full object-cover">
-                    <span class="text-gray-800 font-medium">${post.author.name} ${post.author.lastname}</span>
-                    <span class="text-gray-500 text-xs">${new Date(post.fecha_publicacion).toLocaleDateString()}</span>
+                    <img src="${post.author.profile_picture || '/sphere/images/profile/default-avatar.png'}" class="w-8 h-8 rounded-full object-cover">
+                    <span class="text-gray-800 font-medium">${post.author.first_name} ${post.author.last_name}</span>
+                    <span class="text-gray-500 text-xs">${new Date(post.posted_at).toLocaleDateString()}</span>
                 </a>
             </div>
             <div class="relative z-10">
@@ -182,7 +184,7 @@ async function createPostElement(post, index) {
         <div class="mb-4">
             ${images}
             <div class="mt-3">
-                <h3 class="text-lg font-semibold text-gray-800 cursor-pointer hover:text-blue-500">${post.titulo}</h3>
+                <h3 class="text-lg font-semibold text-gray-800 cursor-pointer hover:text-blue-500">${post.title}</h3>
                 <p class="post-content text-gray-600 text-sm mt-1 cursor-pointer hover:text-blue-500">${truncatedContent}</p>
                 <button class="read-more-btn text-blue-500 hover:underline text-sm mt-2">Read More</button>
             </div>
@@ -209,7 +211,6 @@ async function createPostElement(post, index) {
         </div>
     `;
 
-    // Modal handlers
     const title = postElement.querySelector('h3');
     const content = postElement.querySelector('.post-content');
     [title, content].forEach(element => {
@@ -226,7 +227,7 @@ async function createPostElement(post, index) {
     if (readMoreBtn) {
         readMoreBtn.addEventListener('click', () => {
             const content = postElement.querySelector('.post-content');
-            if (content) content.textContent = post.contenido;
+            if (content) content.textContent = post.content;
             readMoreBtn.style.display = 'none';
         });
     }
@@ -259,7 +260,6 @@ async function createPostElement(post, index) {
     return postElement;
 }
 
-// Función para mostrar el modal
 function showPostModal(post) {
     let modal = document.getElementById('post-modal');
     if (!modal) {
@@ -274,12 +274,12 @@ function showPostModal(post) {
             <button id="close-modal-btn" class="absolute top-2 right-2 text-gray-600 hover:text-gray-800">
                 <ion-icon name="close-outline" class="text-2xl"></ion-icon>
             </button>
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">${post.titulo}</h2>
-            ${createImageCarousel(post.images, post.titulo, 'modal')}
-            <p class="text-gray-600 mt-4">${post.contenido}</p>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">${post.title}</h2>
+            ${createImageCarousel(post.images, post.title, 'modal')}
+            <p class="text-gray-600 mt-4">${post.content}</p>
             <div class="flex items-center justify-between text-sm text-gray-500 mt-4">
-                <span>By ${post.author.name} ${post.author.lastname}</span>
-                <span>${new Date(post.fecha_publicacion).toLocaleDateString()}</span>
+                <span>By ${post.author.first_name} ${post.author.last_name}</span>
+                <span>${new Date(post.posted_at).toLocaleDateString()}</span>
             </div>
             <div class="mt-4 flex items-center space-x-4">
                 <button class="reaction-btn flex items-center space-x-1 text-gray-600 hover:text-blue-500" data-post-id="${post.id}">
@@ -334,7 +334,7 @@ document.addEventListener('click', (event) => {
 function createCommentHTML(comment, currentUserId) {
     return `
         <div class="comment flex items-start space-x-2 border-b" data-comment-id="${comment.id}">
-            <p class="text-gray-600 text-sm">${comment.contenido} <span class="text-gray-500 text-xs">- ${comment.user_name} (${new Date(comment.fecha_creacion).toLocaleString()})</span>
+            <p class="text-gray-600 text-sm">${comment.content} <span class="text-gray-500 text-xs">- ${comment.user_name} (${new Date(comment.created_at).toLocaleString()})</span>
                 ${comment.user_id === currentUserId ? `
                     <button class="edit-comment-btn text-blue-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Edit</button>
                 ` : ''}
@@ -404,9 +404,9 @@ async function handleComment(postId, postElement) {
             if (commentsList) {
                 const newCommentHTML = createCommentHTML({
                     id: data.comment_id || Date.now(),
-                    contenido: content,
+                    content: content,
                     user_name: userName,
-                    fecha_creacion: new Date(),
+                    created_at: new Date(),
                     user_id: currentUserId
                 }, currentUserId);
                 commentsList.insertAdjacentHTML('beforeend', newCommentHTML);
@@ -518,8 +518,8 @@ async function getCurrentUserId() {
             credentials: 'include'
         });
         const data = await response.json();
-        if (data.success && data.usuario?.length) {
-            const userId = parseInt(data.usuario[0].id);
+        if (data.success && data.user?.length) {
+            const userId = parseInt(data.user[0].id);
             localStorage.setItem('userId', userId);
             return userId;
         }
@@ -533,9 +533,13 @@ async function getCurrentUserId() {
 
 async function getCurrentUserName() {
     try {
-        const response = await fetch('/sphere/api/get_user.php');
+        const response = await fetch('/sphere/api/get_user.php', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        });
         const data = await response.json();
-        return data.success && data.usuario?.length ? data.usuario[0].nombre : 'Unknown';
+        return data.success && data.user?.length ? data.user[0].first_name : 'Unknown';
     } catch (error) {
         console.error('Error getting current user name:', error);
         return 'Unknown';
@@ -549,7 +553,7 @@ function truncateContent(content, wordLimit) {
 
 async function editPost(post) {
     const currentUserId = await getCurrentUserId();
-    const postUserId = parseInt(post.usuario_id);
+    const postUserId = parseInt(post.user_id);
     if (postUserId !== currentUserId) {
         alert('You do not have permission to edit this post.');
         return;

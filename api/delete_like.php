@@ -18,7 +18,7 @@ if (!$post_id) {
 }
 
 $pdo = getDBConnection();
-$stmt = $pdo->prepare("DELETE FROM likes WHERE post_id = ? AND usuario_id = ?");
+$stmt = $pdo->prepare("DELETE FROM likes WHERE post_id = ? AND user_id = ?");
 $success = $stmt->execute([$post_id, $_SESSION['user_id']]);
 
 echo json_encode(['success' => $success]);

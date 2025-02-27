@@ -4,17 +4,17 @@ session_start();
 header('Content-Type: application/json');
 require_once 'config.php';
 
-$correo = $_POST['correo'] ?? '';
+$email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
 
-if (!$correo || !$password) {
+if (!$email || !$password) {
     echo json_encode(['success' => false, 'message' => 'Missing fields']);
     exit;
 }
 
 $pdo = getDBConnection();
-$stmt = $pdo->prepare("SELECT id, password FROM usuarios WHERE correo = ? AND estado = 'activo'");
-$stmt->execute([$correo]);
+$stmt = $pdo->prepare("SELECT id, password FROM users WHERE email = ? AND status = 'active'");
+$stmt->execute([$email]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($user && password_verify($password, $user['password'])) {

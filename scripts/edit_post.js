@@ -34,9 +34,9 @@ async function loadPostData(postId) {
             return;
         }
 
-        document.getElementById('titulo').value = post.titulo;
-        document.getElementById('contenido').value = post.contenido;
-        document.getElementById('categoria_id').value = post.categoria_id;
+        document.getElementById('title').value = post.title;
+        document.getElementById('content').value = post.content;
+        document.getElementById('category_id').value = post.category_id;
     } catch (error) {
         console.error('Error loading post data:', error);
         alert('Error loading post');
@@ -49,9 +49,9 @@ async function savePostChanges(postId) {
     const formData = new FormData(form);
     const postData = {
         post_id: postId,
-        titulo: formData.get('titulo'),
-        contenido: formData.get('contenido'),
-        categoria_id: formData.get('categoria_id')
+        title: formData.get('title'),
+        content: formData.get('content'),
+        category_id: formData.get('category_id')
     };
 
     try {

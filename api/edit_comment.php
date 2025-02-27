@@ -18,7 +18,7 @@ if (!$comment_id || !$content) {
 }
 
 $pdo = getDBConnection();
-$stmt = $pdo->prepare("UPDATE comentarios SET contenido = ? WHERE id = ? AND usuario_id = ?");
+$stmt = $pdo->prepare("UPDATE comments SET content = ? WHERE id = ? AND user_id = ?");
 $success = $stmt->execute([$content, $comment_id, $_SESSION['user_id']]);
 
 echo json_encode(['success' => $success]);

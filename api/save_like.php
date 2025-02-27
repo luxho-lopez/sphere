@@ -18,7 +18,7 @@ if (!$post_id) {
 }
 
 $pdo = getDBConnection();
-$stmt = $pdo->prepare("INSERT INTO likes (post_id, usuario_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE id = id");
+$stmt = $pdo->prepare("INSERT INTO likes (post_id, user_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE id = id");
 $success = $stmt->execute([$post_id, $_SESSION['user_id']]);
 
 echo json_encode(['success' => $success]);

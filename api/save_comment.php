@@ -19,7 +19,7 @@ if (!$post_id || !$content) {
 }
 
 $pdo = getDBConnection();
-$stmt = $pdo->prepare("INSERT INTO comentarios (post_id, usuario_id, contenido) VALUES (?, ?, ?)");
+$stmt = $pdo->prepare("INSERT INTO comments (post_id, user_id, content) VALUES (?, ?, ?)");
 $success = $stmt->execute([$post_id, $_SESSION['user_id'], $content]);
 
 echo json_encode(['success' => $success]);

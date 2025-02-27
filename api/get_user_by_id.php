@@ -14,15 +14,15 @@ try {
     $pdo = getDBConnection();
     
     $stmt = $pdo->prepare("
-        SELECT id, nombre, apellido, correo, foto_perfil 
-        FROM usuarios 
-        WHERE id = ? AND estado = 'activo'
+        SELECT id, first_name, last_name, email, profile_picture 
+        FROM users 
+        WHERE id = ? AND status = 'active'
     ");
     $stmt->execute([$userId]);
     $user = $stmt->fetch();
 
     if ($user) {
-        echo json_encode(['success' => true, 'usuario' => $user]);
+        echo json_encode(['success' => true, 'user' => $user]);
     } else {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'User not found']);

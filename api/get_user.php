@@ -9,9 +9,9 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $pdo = getDBConnection();
-$stmt = $pdo->prepare("SELECT id, correo, nombre, apellido, foto_perfil, fecha_registro FROM usuarios WHERE id = ?");
+$stmt = $pdo->prepare("SELECT id, email, first_name, last_name, profile_picture, registered_at FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-echo json_encode(['success' => true, 'usuario' => [$user]]);
+echo json_encode(['success' => true, 'user' => [$user]]);
 ?>

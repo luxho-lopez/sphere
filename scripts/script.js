@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const user = await fetchUserProfile(); // Configura el header y devuelve el usuario si está autenticado
+        const user = await fetchUserProfile();
         if (user) {
-            await fetchNotifications(); // Solo cargar notificaciones si hay una sesión activa
+            await fetchNotifications();
         }
         highlightSelectedMenuItem();
         setupMenuClickHandlers();
@@ -46,7 +46,6 @@ async function fetchNotifications() {
                 </div>
             `).join('');
             
-            // Agregar manejadores para alternar estado de leído/no leído
             notificationsList.querySelectorAll('.toggle-read-btn').forEach(btn => {
                 btn.addEventListener('click', async function(e) {
                     e.stopPropagation();
@@ -132,7 +131,7 @@ async function fetchUserProfile() {
         if (!response.ok) throw new Error('Unauthorized');
 
         const data = await response.json();
-        const user = data.success && data.usuario?.length ? data.usuario[0] : null;
+        const user = data.success && data.user?.length ? data.user[0] : null;
 
         if (logoContainer) {
             logoContainer.innerHTML = `
@@ -145,15 +144,15 @@ async function fetchUserProfile() {
         }
 
         if (user && profileHeader) {
-            const userNameSlug = (user.nombre + '-' + (user.apellido || '')).toLowerCase().replace(/\s+/g, '-');
+            const userNameSlug = (user.first_name + '-' + (user.last_name || '')).toLowerCase().replace(/\s+/g, '-');
             profileHeader.innerHTML = `
                 <a href="/sphere/profile.html?user=${user.id}-${userNameSlug}" class="user-profile-link flex items-center space-x-2">
-                    <img src="${user.foto_perfil || '/sphere/images/profile/default-avatar.png'}" alt="${user.nombre}" class="w-8 h-8 rounded-full object-cover">
+                    <img src="${user.profile_picture || '/sphere/images/profile/default-avatar.png'}" alt="${user.first_name}" class="w-8 h-8 rounded-full object-cover">
                 </a>
                 <ul class="sub-menu absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-40 hidden">
-                    <li><a href="/sphere/profile.html?user=${user.id}-${userNameSlug}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">${user.nombre} - Ver perfil</a></li>
-                    <li><a href="/sphere/change_password.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Cambiar contraseña</a></li>
-                    <li><a href="/sphere/api/logout.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Cerrar sesión</a></li>
+                    <li><a href="/sphere/profile.html?user=${user.id}-${userNameSlug}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">${user.first_name} - View profile</a></li>
+                    <li><a href="/sphere/change_password.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Change password</a></li>
+                    <li><a href="/sphere/api/logout.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Log out</a></li>
                 </ul>
             `;
             if (profileLink) profileLink.classList.remove('hidden');
@@ -171,7 +170,7 @@ async function fetchUserProfile() {
                 });
             }
         } else if (profileHeader) {
-            profileHeader.innerHTML = '<a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800 text-sm">Iniciar sesión</a>';
+            profileHeader.innerHTML = '<a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800 text-sm">Log in</a>';
             if (profileLink) profileLink.classList.add('hidden');
             if (notifyLink) notifyLink.classList.add('hidden');
             if (newPostLink) newPostLink.classList.add('hidden');
@@ -194,7 +193,7 @@ async function fetchUserProfile() {
         console.error('Error fetching user profile in script.js:', error);
         const profileHeader = document.getElementById('user-profile');
         if (profileHeader) {
-            profileHeader.innerHTML = '<a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800 text-sm">Iniciar sesión</a>';
+            profileHeader.innerHTML = '<a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800 text-sm">Log in</a>';
             const profileLink = document.querySelector('.profile-link');
             const notifyLink = document.querySelector('.notify-link');
             const newPostLink = document.querySelector('.new_post-link');

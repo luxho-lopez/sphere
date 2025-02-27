@@ -18,7 +18,7 @@ if (!$current_password || !$new_password) {
 }
 
 $pdo = getDBConnection();
-$stmt = $pdo->prepare("SELECT password FROM usuarios WHERE id = ?");
+$stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -28,7 +28,7 @@ if (!password_verify($current_password, $user['password'])) {
 }
 
 $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-$stmt = $pdo->prepare("UPDATE usuarios SET password = ? WHERE id = ?");
+$stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
 $success = $stmt->execute([$hashed_password, $_SESSION['user_id']]);
 
 echo json_encode(['success' => $success]);

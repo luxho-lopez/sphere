@@ -23,10 +23,10 @@ try {
     $pdo = getDBConnection();
     $userId = $_SESSION['user_id'];
 
-    // Verificar que el comentario pertenezca al usuario actual
+    // Verify that the comment belongs to the current user and delete it
     $stmt = $pdo->prepare("
-        DELETE FROM comentarios 
-        WHERE id = ? AND usuario_id = ?
+        DELETE FROM comments 
+        WHERE id = ? AND user_id = ?
     ");
     $stmt->execute([$commentId, $userId]);
     
