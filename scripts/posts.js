@@ -61,8 +61,8 @@ async function createPostElement(post, index) {
             <div class="flex items-center space-x-3">
                 <a href="/sphere/profile.html?user=${postUserId}-${userNameSlug}" class="flex items-center space-x-2">
                     <img src="${post.author.profile_picture || '/sphere/images/profile/default-avatar.png'}" class="w-8 h-8 rounded-full object-cover">
-                    <span class="text-gray-800 font-medium">${post.author.first_name} ${post.author.last_name}</span>
-                    <span class="text-gray-500 text-xs">${new Date(post.posted_at).toLocaleDateString()}</span>
+                    <span class="text-gray-800 font-medium">@${post.author.username}</span>
+                    <span class="text-gray-500 text-xs">- ${new Date(post.posted_at).toLocaleDateString()}</span>
                 </a>
             </div>
             <div class="relative z-10">
@@ -78,23 +78,23 @@ async function createPostElement(post, index) {
         <div class="mb-4">
             ${images}
             <div class="mt-3">
-                <h3 class="text-lg font-semibold text-gray-800 cursor-pointer hover:text-blue-500">${post.title}</h3>
-                <p class="post-content text-gray-600 text-sm mt-1 cursor-pointer hover:text-blue-500">${truncatedContent}</p>
+                <h3 class="text-lg font-semibold text-gray-800 cursor-pointer">${post.title}</h3>
+                <p class="post-content text-gray-600 text-sm mt-1 cursor-pointer">${truncatedContent}</p>
                 <button class="read-more-btn text-blue-500 hover:underline text-sm mt-2">Read More</button>
             </div>
         </div>
-        <div class="comments-section border-t pt-4" data-post-id="${post.id}">
+        <div class="comments-section border-t pt-4 pb-4 hidden" data-post-id="${post.id}">
             <textarea class="comment-input w-full p-2 border rounded resize-none text-sm" placeholder="Add a comment..."></textarea>
             <button class="submit-comment-btn mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Post</button>
         </div>
-        <div class="flex flex-col mt-4">
+        <div class="flex flex-col pt-4 border-t">
             <div class="flex justify-around mb-2 space-x-4">
                 <button class="reaction-btn flex items-center space-x-1" data-post-id="${post.id}">
-                    <ion-icon name="${post.user_liked ? 'heart' : 'heart-outline'}" class="text-base" style="color: ${post.user_liked ? 'green' : 'gray'};"></ion-icon>
+                    <ion-icon name="${post.user_liked ? 'heart' : 'heart-outline'}" class="text-base" style="color: ${post.user_liked ? 'oklch(0.623 0.214 259.815)' : 'gray'};"></ion-icon>
                     <span class="like-count text-gray-600 text-sm">${post.like_count}</span>
                 </button>
                 <button class="comment-btn flex items-center space-x-1">
-                    <ion-icon name="chatbubbles-outline" class="text-base" style="color: ${commentsList.length >= 1 ? 'green' : 'gray'};"></ion-icon>
+                    <ion-icon name="chatbubbles-outline" class="text-base" style="color: ${commentsList.length >= 1 ? 'oklch(0.623 0.214 259.815)' : 'gray'};"></ion-icon>
                     <span class="comment-count text-gray-600 text-sm">${commentsList.length}</span>
                 </button>
             </div>
@@ -119,6 +119,11 @@ async function createPostElement(post, index) {
     if (reactionBtn) reactionBtn.addEventListener('click', () => handleLike(post, postElement));
 
     const readMoreBtn = postElement.querySelector('.read-more-btn');
+    // Ocultar el botón "Read More" si el contenido truncado es menor o igual a 50 caracteres
+    if (truncatedContent.length <= 50) {
+        readMoreBtn.style.display = 'none';
+    }
+
     if (readMoreBtn) {
         readMoreBtn.addEventListener('click', () => {
             const content = postElement.querySelector('.post-content');
@@ -157,6 +162,13 @@ async function createPostElement(post, index) {
         btn.addEventListener('click', () => deleteComment(btn.dataset.commentId, postElement, post.id));
     });
 
+    // Nueva función para mostrar/ocultar la caja de nuevo comentario
+    const commentBtn = postElement.querySelector('.comment-btn');
+    const commentsSection = postElement.querySelector('.comments-section');
+    if (commentBtn && commentsSection) {
+        commentBtn.addEventListener('click', () => toggleCommentsSection(commentsSection));
+    }
+
     return postElement;
 }
 
@@ -183,7 +195,7 @@ function showPostModal(post) {
             </div>
             <div class="mt-4 flex items-center space-x-4">
                 <button class="reaction-btn flex items-center space-x-1 text-gray-600 hover:text-blue-500" data-post-id="${post.id}">
-                    <ion-icon name="${post.user_liked ? 'heart' : 'heart-outline'}" class="text-xl" style="color: ${post.user_liked ? 'green' : 'gray'};"></ion-icon>
+                    <ion-icon name="${post.user_liked ? 'heart' : 'heart-outline'}" class="text-xl" style="color: ${post.user_liked ? 'oklch(0.623 0.214 259.815)' : 'gray'};"></ion-icon>
                     <span class="like-count">${post.like_count}</span>
                 </button>
             </div>
@@ -234,7 +246,7 @@ document.addEventListener('click', (event) => {
 function createCommentHTML(comment, currentUserId) {
     return `
         <div class="comment flex items-start space-x-2 border-b" data-comment-id="${comment.id}">
-            <p class="text-gray-600 text-sm">${comment.content} <span class="text-gray-500 text-xs">- ${comment.user_name} (${new Date(comment.created_at).toLocaleString()})</span>
+            <p class="text-gray-600 text-sm">${comment.content} <span class="text-gray-500 text-xs">- @${comment.username} (${new Date(comment.created_at).toLocaleString()})</span>
                 ${comment.user_id === currentUserId ? `
                     <button class="edit-comment-btn text-blue-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Edit</button>
                     <button class="delete-comment-btn text-red-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Delete</button>
@@ -274,7 +286,7 @@ async function handleLike(post, element) {
                 const icon = btn.querySelector('ion-icon');
                 if (icon) {
                     icon.name = post.user_liked ? 'heart' : 'heart-outline';
-                    icon.style.color = post.user_liked ? 'green' : 'gray';
+                    icon.style.color = post.user_liked ? 'oklch(0.623 0.214 259.815)' : 'gray';
                 }
                 const count = btn.querySelector('.like-count');
                 if (count) count.textContent = `${post.like_count}`;
@@ -286,7 +298,7 @@ async function handleLike(post, element) {
                     const mainIcon = mainBtn.querySelector('ion-icon');
                     if (mainIcon) {
                         mainIcon.name = post.user_liked ? 'heart' : 'heart-outline';
-                        mainIcon.style.color = post.user_liked ? 'green' : 'gray';
+                        mainIcon.style.color = post.user_liked ? 'oklch(0.623 0.214 259.815)' : 'gray';
                     }
                     const mainCount = mainBtn.querySelector('.like-count');
                     if (mainCount) mainCount.textContent = `${post.like_count}`;
@@ -298,6 +310,12 @@ async function handleLike(post, element) {
     } catch (error) {
         console.error('Error handling like:', error);
     }
+}
+
+
+// Funcion que oculta y muestra la caja de nuevo comentario
+function toggleCommentsSection(commentsSection) {
+    commentsSection.classList.toggle('hidden');
 }
 
 async function handleComment(postId, postElement) {
@@ -347,7 +365,7 @@ async function handleComment(postId, postElement) {
                 const currentCount = parseInt(commentCount.textContent) || 0;
                 commentCount.textContent = currentCount + 1;
                 const commentIcon = postElement.querySelector('.comment-btn ion-icon');
-                if (commentIcon) commentIcon.style.color = (currentCount + 1) >= 1 ? 'green' : 'gray';
+                if (commentIcon) commentIcon.style.color = (currentCount + 1) >= 1 ? 'oklch(0.623 0.214 259.815)' : 'gray';
             }
 
             updateViewMoreButton(postElement, postId);
@@ -447,7 +465,7 @@ async function deleteComment(commentId, postElement, postId) {
                 const currentCount = parseInt(commentCount.textContent) || 0;
                 commentCount.textContent = currentCount - 1;
                 const commentIcon = postElement.querySelector('.comment-btn ion-icon');
-                if (commentIcon) commentIcon.style.color = (currentCount - 1) >= 1 ? 'green' : 'gray';
+                if (commentIcon) commentIcon.style.color = (currentCount - 1) >= 1 ? 'oklch(0.623 0.214 259.815)' : 'gray';
             }
 
             updateViewMoreButton(postElement, postId);

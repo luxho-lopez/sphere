@@ -6,7 +6,7 @@ require_once 'config.php';
 $pdo = getDBConnection();
 
 $query = "
-    SELECT p.*, u.first_name, u.last_name, u.profile_picture, 
+    SELECT p.*, u.first_name, u.last_name, u.username, u.profile_picture, 
            (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
            EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?) AS user_liked
     FROM posts p
@@ -25,7 +25,7 @@ foreach ($posts as &$post) {
     $post['images'] = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
     $stmt = $pdo->prepare("
-        SELECT c.id, c.content, c.created_at, u.first_name AS user_name, u.id AS user_id
+        SELECT c.id, c.content, c.created_at, u.username AS username, u.id AS user_id
         FROM comments c
         LEFT JOIN users u ON c.user_id = u.id
         WHERE c.post_id = ?
@@ -37,10 +37,11 @@ foreach ($posts as &$post) {
     $post['author'] = [
         'first_name' => $post['first_name'],
         'last_name' => $post['last_name'],
+        'username' => $post['username'],
         'profile_picture' => $post['profile_picture'] ?? '/images/profile/default-avatar.png'
     ];
     // Keep user_id at the root level of the post
-    unset($post['first_name'], $post['last_name'], $post['profile_picture']);
+    unset($post['first_name'], $post['last_name'], $post['username'], $post['profile_picture']);
 }
 
 echo json_encode($posts);
