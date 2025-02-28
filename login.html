@@ -11,14 +11,24 @@
         <section class="max-w-md w-full">
             <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Login</h2>
             <form id="login-form" class="bg-white shadow-md rounded-lg p-6 space-y-4">
-                <a href="/sphere/index.html"><img src="/sphere/images/sphere.gif" alt="sphere" srcset=""></a>
-                <input type="email" name="email" placeholder="Email" class="w-full p-2 border rounded text-sm" required>
-                <input type="password" name="password" placeholder="Password" class="w-full p-2 border rounded text-sm" required>
+                <div class="logo flex justify-center items-center space-x-2">
+                    <a href="/sphere/index.html">
+                        <h1 class="text-2xl font-bold text-gray-800">Sphere</h1>
+                    </a>
+                </div>
+                <input type="text" name="contact" placeholder="Email or Phone Number" class="w-full p-2 border rounded text-sm" required>
+                <div class="password-container" style="position: relative;">
+                    <input type="password" id="password" name="password" placeholder="Password" class="w-full p-2 border rounded text-sm" required>
+                    <ion-icon name="eye-outline" id="toggle-password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></ion-icon>
+                </div>
                 <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Login</button>
                 <p class="text-center text-gray-600 text-sm">Don't have an account? <a href="register.html" class="text-blue-500 hover:underline">Register</a></p>
+                <p class="text-center text-gray-600 text-sm"><a href="forgot_password.html" class="text-blue-500 hover:underline">Forgot your password?</a></p>
             </form>
         </section>
     </main>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script src="/sphere/scripts/login.js" defer></script>
 </body>
 </html>

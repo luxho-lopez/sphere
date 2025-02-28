@@ -144,13 +144,14 @@ async function fetchUserProfile() {
         }
 
         if (user && profileHeader) {
-            const userNameSlug = (user.first_name + '-' + (user.last_name || '')).toLowerCase().replace(/\s+/g, '-');
+            // const userNameSlug = (user.first_name + '-' + (user.last_name || '')).toLowerCase().replace(/\s+/g, '-');
+            // const usersame = (user.username);
             profileHeader.innerHTML = `
-                <a href="/sphere/profile.html?user=${user.id}-${userNameSlug}" class="user-profile-link flex items-center space-x-2">
+                <a href="/sphere/profile.html?user=${user.id}@${user.username}" class="user-profile-link flex items-center space-x-2">
                     <img src="${user.profile_picture || '/sphere/images/profile/default-avatar.png'}" alt="${user.first_name}" class="w-8 h-8 rounded-full object-cover">
                 </a>
                 <ul class="sub-menu absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-40 hidden">
-                    <li><a href="/sphere/profile.html?user=${user.id}-${userNameSlug}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">${user.first_name} - View profile</a></li>
+                    <li><a href="/sphere/profile.html?user=${user.id}@${user.username}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">${user.first_name} - View profile</a></li>
                     <li><a href="/sphere/change_password.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Change password</a></li>
                     <li><a href="/sphere/api/logout.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Log out</a></li>
                 </ul>
@@ -246,7 +247,7 @@ function restrictUnauthorizedURLs() {
         '/sphere/index.html', '/sphere/profile.html', '/sphere/new_post.html',
         '/sphere/notify.html', '/sphere/trending.html', '/sphere/explorer.html',
         '/sphere/all_posts.html', '/sphere/post.html', '/sphere/login.html', '/sphere/register.html',
-        '/sphere/change_password.html', '/sphere/edit_post.html'
+        '/sphere/change_password.html', '/sphere/edit_post.html', '/sphere/forgot_password.html'
     ];
     const currentPath = window.location.pathname;
     if (!validPaths.includes(currentPath)) {

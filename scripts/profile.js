@@ -164,12 +164,11 @@ async function createPostElement(post, index) {
     const currentUserId = await getCurrentUserId();
     const postUserId = parseInt(post.user_id);
     const commentsHTML = visibleComments.map(comment => createCommentHTML(comment, currentUserId)).join('');
-    const userNameSlug = (post.author.first_name + '-' + (post.author.last_name || '')).toLowerCase().replace(/\s+/g, '-');
 
     postElement.innerHTML = `
         <div class="flex justify-between items-center mb-4">
             <div class="flex items-center space-x-3">
-                <a href="/sphere/profile.html?user=${postUserId}-${userNameSlug}" class="flex items-center space-x-2">
+                <a href="/sphere/profile.html?user=${postUserId}@${post.author.username}" class="flex items-center space-x-2">
                     <img src="${post.author.profile_picture || '/sphere/images/profile/default-avatar.png'}" class="w-8 h-8 rounded-full object-cover">
                     <span class="text-gray-800 font-medium">@${post.author.username}</span>
                     <span class="text-gray-500 text-xs">- ${new Date(post.posted_at).toLocaleDateString()}</span>
