@@ -151,9 +151,10 @@ async function fetchUserProfile() {
                     <img src="${user.profile_picture || '/sphere/images/profile/default-avatar.png'}" alt="${user.first_name}" class="w-8 h-8 rounded-full object-cover">
                 </a>
                 <ul class="sub-menu absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-40 hidden">
-                    <li><a href="/sphere/profile.html?user=${user.id}@${user.username}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">${user.first_name} - View profile</a></li>
-                    <li><a href="/sphere/change_password.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Change password</a></li>
-                    <li><a href="/sphere/api/logout.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Log out</a></li>
+                    <li><a href="/sphere/profile.html?user=${user.id}@${user.username}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm"><ion-icon name="person-circle-outline"></ion-icon> ${user.first_name}</a></li>
+                    <li><a href="/sphere/change_password.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm"><ion-icon name="key-outline"></ion-icon> Change password</a></li>
+                    <li><a href="/sphere/settings.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm"><ion-icon name="cog-outline"></ion-icon> Settings</a></li>
+                    <li><a href="/sphere/api/logout.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">Log out <ion-icon name="power-outline"></ion-icon></a></li>
                 </ul>
             `;
             if (profileLink) profileLink.classList.remove('hidden');
@@ -245,7 +246,7 @@ function setupMenuClickHandlers() {
 function restrictUnauthorizedURLs() {
     const validPaths = [
         '/sphere/index.html', '/sphere/profile.html', '/sphere/new_post.html',
-        '/sphere/notify.html', '/sphere/trending.html', '/sphere/explorer.html',
+        '/sphere/settings.html', '/sphere/trending.html', '/sphere/explorer.html',
         '/sphere/all_posts.html', '/sphere/post.html', '/sphere/login.html', '/sphere/register.html',
         '/sphere/change_password.html', '/sphere/edit_post.html', '/sphere/forgot_password.html'
     ];
