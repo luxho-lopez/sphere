@@ -9,10 +9,8 @@ const headerTemplate = `
         <div class="search-div w-full max-w-sm min-w-[200px] md:block hidden">
             <div class="relative">
                 <input class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-3 pr-28 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow" placeholder="Posts..." />
-                <button class="bg-blue-500 absolute top-1 right-1 flex items-center rounded bg-slate-800 py-1 px-2.5 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
-                    <ion-icon name="search-outline"></ion-icon>
-                    Search
-                </button>
+                <ion-icon name="search-outline"></ion-icon>
+                
             </div>
         </div>
         <button class="search-icon md:hidden text-gray-600 hover:text-gray-800 focus:outline-none">
@@ -22,11 +20,12 @@ const headerTemplate = `
             <ul id="nav-menu" class="flex items-center space-x-6">
                 <li class="login-link"><a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800">Log In</a></li>
                 <li class="register-link"><a href="/sphere/register.html" class="text-gray-600 hover:text-gray-800">Register</a></li>
-                <li class="new_post-link hidden">
-                    <a href="/sphere/new_post.html" class="text-gray-600 hover:text-gray-800 md:block hidden">New Post</a>
-                    <button class="new-post-icon md:hidden text-gray-600 hover:text-gray-800 focus:outline-none">
-                        <ion-icon name="add-outline" class="text-2xl"></ion-icon>
-                    </button>
+                <li class="new_post-link">
+                    <a href="/sphere/new_post.html" class="text-gray-600 hover:text-gray-800">
+                        <span class="inline-flex shrink-0 rounded-full border border-blue-300 bg-blue-100 p-2 dark:border-blue-300/10 dark:bg-blue-400/10">
+                            <ion-icon name="add-outline"></ion-icon>
+                        </span>
+                    </a>
                 </li>
                 <li class="notify-link relative hidden">
                     <div id="user-notify" class="text-gray-600 hover:text-gray-800 cursor-pointer">

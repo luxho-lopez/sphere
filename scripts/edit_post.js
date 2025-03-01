@@ -36,7 +36,6 @@ async function loadPostData(postId) {
 
         document.getElementById('title').value = post.title;
         document.getElementById('content').value = post.content;
-        document.getElementById('category_id').value = post.category_id;
     } catch (error) {
         console.error('Error loading post data:', error);
         alert('Error loading post');
@@ -50,8 +49,7 @@ async function savePostChanges(postId) {
     const postData = {
         post_id: postId,
         title: formData.get('title'),
-        content: formData.get('content'),
-        category_id: formData.get('category_id')
+        content: formData.get('content')
     };
 
     try {

@@ -1,126 +1,155 @@
 /* Estilos de Swiper */
-        .swiper-container {
-            width: 100%;
-            max-height: 50vh;
-            overflow: hidden;
-            position: relative;
-        }
-        .swiper-wrapper {
-            height: 100%;
-        }
-        .swiper-slide {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-        .swiper-slide img {
-            max-width: 100%;
-            max-height: 48vh;
-            height: auto;
-            object-fit: contain;
-            border-radius: 0.5rem;
-        }
-        .swiper-button-next, 
-        .swiper-button-prev {
-            color: rgba(31, 41, 55, 0.6) !important;
-            width: 30px;
-            height: 30px;
-            margin-top: -15px;
-            transition: color 0.3s;
-        }
-        .swiper-button-next:hover, 
-        .swiper-button-prev:hover {
-            color: rgba(59, 130, 246, 0.4) !important;
-        }
-        .swiper-pagination {
-            position: absolute;
-            bottom: 10px;
-        }
-        .swiper-pagination-bullet {
-            background: rgba(59, 130, 246, 0.6) !important;
-            opacity: 0.7;
-        }
-        .swiper-pagination-bullet-active {
-            background-color: rgba(59, 130, 246, 0.6) !important;
-            opacity: 1;
-        }
-        /* Estilos para header y aside */
-        header {
-            position: fixed; /* Fijo para que se mantenga en la parte superior */
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 50; /* Encima de todo */
-            transition: transform 0.3s ease-in-out; /* Añadimos transición suave */
-        }
-        aside {
-            z-index: 40; /* Debajo del header, encima del main */
-        }
-        /* Solo aplicar transform en pantallas pequeñas */
-        @media (max-width: 767px) {
-            aside {
-                transition: transform 0.3s ease-in-out;
-            }
-            aside.hidden {
-                transform: translateX(-100%);
-            }
-            aside:not(.hidden) {
-                transform: translateX(0);
-            }
-            /* Submenús en pantallas pequeñas */
-            .search-submenu {
-                position: absolute;
-                top: 100%;
-                right: 0;
-                background: white;
-                border: 1px solid #e5e7eb;
-                border-radius: 0.5rem;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                width: 200px;
-                z-index: 60; /* Sobre el header y aside */
-                max-height: 300px;
-                overflow-y: auto;
-                display: none;
-            }
-            .search-submenu.active {
-                display: block;
-            }
-            .new-post-icon, .search-icon {
-                display: block; /* Aseguramos que los íconos sean visibles */
-            }
-            .search-div, .new_post-link a {
-                display: none; /* Ocultar elementos de texto en pantallas pequeñas */
-            }
-            .search-input {
-                width: 100%;
-                padding: 0.5rem;
-                border: none;
-                border-bottom: 1px solid #e5e7eb;
-                outline: none;
-            }
-            .notification-item {
-                padding: 0.5rem 1rem;
-                border-bottom: 1px solid #e5e7eb;
-                cursor: pointer;
-            }
-            .notification-item:hover {
-                background-color: #f3f4f6;
-            }
-        }
-        @media (min-width: 768px) {
-            .search-icon, .new-post-icon {
-                display: none !important; /* Ocultar íconos en pantallas grandes */
-            }
-            .search-div {
-                display: block;
-            }
-            .new_post-link a {
-                display: block;
-            }
-        }
-        /* Asegurar que IonIcons se muestren correctamente */
-        ion-icon {
-            display: inline-flex !important;
-            vertical-align: middle;
-        }
+.swiper-container {
+    width: 100%;
+    max-height: 50vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.swiper-wrapper {
+    height: 100%;
+}
+
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.swiper-slide img {
+    max-width: 100%;
+    max-height: 48vh;
+    height: auto;
+    object-fit: contain;
+    border-radius: 0.5rem;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    color: rgba(31, 41, 55, 0.6) !important;
+    width: 30px;
+    height: 30px;
+    margin-top: -15px;
+    transition: color 0.3s;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    color: rgba(59, 130, 246, 0.4) !important;
+}
+
+.swiper-pagination {
+    position: absolute;
+    bottom: 10px;
+}
+
+.swiper-pagination-bullet {
+    background: rgba(59, 130, 246, 0.6) !important;
+    opacity: 0.7;
+}
+
+.swiper-pagination-bullet-active {
+    background-color: rgba(59, 130, 246, 0.6) !important;
+    opacity: 1;
+}
+
+/* Estilos para header y aside */
+header {
+    position: fixed;
+    /* Fijo para que se mantenga en la parte superior */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 50;
+    /* Encima de todo */
+    transition: transform 0.3s ease-in-out;
+    /* Añadimos transición suave */
+}
+
+aside {
+    z-index: 40;
+    /* Debajo del header, encima del main */
+}
+
+/* Solo aplicar transform en pantallas pequeñas */
+@media (max-width: 767px) {
+    aside {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    aside.hidden {
+        transform: translateX(-100%);
+    }
+
+    aside:not(.hidden) {
+        transform: translateX(0);
+    }
+
+    /* Submenús en pantallas pequeñas */
+    .search-submenu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 200px;
+        z-index: 60;
+        /* Sobre el header y aside */
+        max-height: 300px;
+        overflow-y: auto;
+        display: none;
+    }
+
+    .search-submenu.active {
+        display: block;
+    }
+
+    .search-icon {
+        display: block;
+        /* Aseguramos que los íconos sean visibles */
+    }
+
+    .search-div {
+        display: none;
+        /* Ocultar elementos de texto en pantallas pequeñas */
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.5rem;
+        border: none;
+        border-bottom: 1px solid #e5e7eb;
+        outline: none;
+    }
+
+    .notification-item {
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid #e5e7eb;
+        cursor: pointer;
+    }
+
+    .notification-item:hover {
+        background-color: #f3f4f6;
+    }
+}
+
+@media (min-width: 768px) {
+
+    .search-icon {
+        display: none !important;
+        /* Ocultar íconos en pantallas grandes */
+    }
+
+    .search-div {
+        display: block;
+    }
+}
+
+/* Asegurar que IonIcons se muestren correctamente */
+ion-icon {
+    display: inline-flex !important;
+    vertical-align: middle;
+}

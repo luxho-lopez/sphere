@@ -12,9 +12,8 @@ $data = json_decode(file_get_contents('php://input'), true);
 $post_id = $data['post_id'] ?? null;
 $title = $data['title'] ?? null;
 $content = $data['content'] ?? null;
-$category_id = $data['category_id'] ?? null;
 
-if (!$post_id || !$title || !$content || !$category_id) {
+if (!$post_id || !$title || !$content) {
     echo json_encode(['success' => false, 'message' => 'Missing required fields']);
     exit;
 }
@@ -32,8 +31,8 @@ if (!$post || $post['user_id'] != $_SESSION['user_id']) {
 }
 
 // Update the post
-$stmt = $pdo->prepare("UPDATE posts SET title = ?, content = ?, category_id = ? WHERE id = ?");
-$success = $stmt->execute([$title, $content, $category_id, $post_id]);
+$stmt = $pdo->prepare("UPDATE posts SET title = ?, content = ? WHERE id = ?");
+$success = $stmt->execute([$title, $content, $post_id]);
 
 echo json_encode(['success' => $success]);
 ?>

@@ -10,7 +10,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'POST',
                     body: formData
                 });
+
+                // Check if response is OK before parsing JSON
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(`Server error: ${response.status} - ${text}`);
+                }
+
                 const data = await response.json();
+                
                 if (data.success) {
                     alert('Post created successfully.');
                     window.location.href = 'index.html';
@@ -19,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error('Error creating post:', error);
-                alert('An error occurred while creating the post.');
+                alert('An error occurred while creating the post: ' + error.message);
             }
         });
     }

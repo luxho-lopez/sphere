@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modalPreview = document.getElementById('modal-preview');
     const passwordConfirm = document.getElementById('password-confirm');
     const currentPassword = document.getElementById('current_password');
+    const togglePassword = document.getElementById('toggle-password');
     const saveBtn = document.getElementById('save-btn');
     const cancelBtn = document.getElementById('cancel-btn');
     const sensitiveFields = ['email', 'phone', 'password', 'username'];
@@ -56,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             passwordConfirm.style.display = sensitiveFields.includes(field) ? 'block' : 'none';
-            modal.style.display = 'block';
+            modal.classList.remove('hidden');
             currentPassword.value = ''; // Reset password field
 
             // Preview uploaded image
@@ -67,6 +68,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                     reader.onload = () => modalPreview.src = reader.result;
                     reader.readAsDataURL(file);
                 }
+            };
+
+            // Toggle password visibility
+            let isPasswordVisible = false;
+            togglePassword.onclick = () => {
+                isPasswordVisible = !isPasswordVisible;
+                currentPassword.type = isPasswordVisible ? 'text' : 'password';
+                togglePassword.innerHTML = isPasswordVisible ? 
+                    '<ion-icon name="eye-off-outline" class="text-xl"></ion-icon>' : 
+                    '<ion-icon name="eye-outline" class="text-xl"></ion-icon>';
             };
 
             saveBtn.onclick = async () => {
@@ -113,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         } else {
                             document.getElementById(field).textContent = modalValue.value;
                         }
-                        modal.style.display = 'none';
+                        modal.classList.add('hidden');
                     } else {
                         alert('Error: ' + (data.message || 'Unknown error'));
                     }
@@ -126,13 +137,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     cancelBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
+        modal.classList.add('hidden');
         modalFile.value = ''; // Reset file input
     });
 
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
-            modal.style.display = 'none';
+            modal.classList.add('hidden');
             modalFile.value = ''; // Reset file input
         }
     });
