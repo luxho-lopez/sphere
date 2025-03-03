@@ -1,119 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings</title>
     <link rel="stylesheet" href="/sphere/styles/main.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
 </head>
-<body class="bg-gray-50 font-sans">
-    <main class="flex-1 ml-0 md:ml-64 mt-16 p-6">
-        <div class="max-w-2xl mx-auto">
-            <h1 class="text-2xl font-semibold text-gray-800 mb-6">Settings</h1>
 
-            <div id="account" class="bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-shadow">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Account</h3>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">Email</span>
-                    <span id="email" class="text-gray-700"></span>
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="email"><ion-icon name="create-outline"></ion-icon></span>
+<body class="bg-gray-50 font-sans min-h-screen">
+    <main class="flex-1 ml-0 md:ml-64 mt-16 p-4 sm:p-6">
+        <div class="max-w-full sm:max-w-2xl mx-auto">
+            <h1 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">Settings</h1>
+
+            <div id="account" class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-6 hover:shadow-md transition-shadow">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Account</h3>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Email</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="email" class="text-gray-700 text-sm sm:text-base truncate flex-1"></span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="email"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">Phone</span>
-                    <span id="phone" class="text-gray-700"></span>
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="phone"><ion-icon name="create-outline"></ion-icon></span>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Phone</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="phone" class="text-gray-700 text-sm sm:text-base truncate flex-1"></span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="phone"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">Password</span>
-                    <span id="password" class="text-gray-700">••••••••</span>
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="password"><ion-icon name="create-outline"></ion-icon></span>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Password</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="password" class="text-gray-700 text-sm sm:text-base">••••••••</span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="password"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">Username</span>
-                    <span id="username" class="text-gray-700"></span>
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="username"><ion-icon name="create-outline"></ion-icon></span>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Username</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="username" class="text-gray-700 text-sm sm:text-base truncate flex-1"></span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="username"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
                 </div>
             </div>
 
-            <div id="profile" class="bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-shadow">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Profile</h3>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">First Name</span>
-                    <span id="first_name" class="text-gray-700"></span>
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="first_name"><ion-icon name="create-outline"></ion-icon></span>
+            <div id="profile" class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-6 hover:shadow-md transition-shadow">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Profile</h3>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">First Name</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="first_name" class="text-gray-700 text-sm sm:text-base truncate flex-1"></span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="first_name"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">Last Name</span>
-                    <span id="last_name" class="text-gray-700"></span>
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="last_name"><ion-icon name="create-outline"></ion-icon></span>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Last Name</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="last_name" class="text-gray-700 text-sm sm:text-base truncate flex-1"></span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="last_name"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">Profile Picture</span>
-                    <img id="profile_picture" class="w-24 h-24 rounded-full object-cover" alt="Profile Picture">
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="profile_picture"><ion-icon name="create-outline"></ion-icon></span>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Profile Picture</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <img id="profile_picture" class="w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover mr-2" alt="Profile Picture">
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="profile_picture"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
                 </div>
-            </div>
-
-            <div id="privacy" class="bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-shadow">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Privacy</h3>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">Profile Visibility</span>
-                    <span id="profile_visibility" class="text-gray-700">Public</span>
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="profile_visibility"><ion-icon name="create-outline"></ion-icon></span>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Cover Photo</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <img id="cover_photo" class="w-24 h-12 sm:w-24 sm:h-16 object-cover rounded-md mr-2" alt="Cover Photo">
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="cover_photo"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">Share Activity</span>
-                    <span id="share_activity" class="text-gray-700">Friends Only</span>
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="share_activity"><ion-icon name="create-outline"></ion-icon></span>
-                </div>
-            </div>
-
-            <div id="preferences" class="bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-shadow">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Preferences</h3>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">Theme</span>
-                    <span id="theme" class="text-gray-700">Light</span>
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="theme"><ion-icon name="create-outline"></ion-icon></span>
-                </div>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">Language</span>
-                    <span id="language" class="text-gray-700">English</span>
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="language"><ion-icon name="create-outline"></ion-icon></span>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Description</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="description" class="text-gray-700 text-sm sm:text-base truncate flex-1 max-w-full sm:max-w-xs"></span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="description"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
                 </div>
             </div>
 
-            <div id="notifications" class="bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-shadow">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Notifications</h3>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">Email Alerts</span>
-                    <span id="email_alerts" class="text-gray-700">On</span>
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="email_alerts"><ion-icon name="create-outline"></ion-icon></span>
+            <div id="privacy" class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-6 hover:shadow-md transition-shadow">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Privacy</h3>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Profile Visibility</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="profile_visibility" class="text-gray-700 text-sm sm:text-base">Public</span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="profile_visibility"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
-                    <span class="text-gray-600 font-medium">Push Notifications</span>
-                    <span id="push_notifications" class="text-gray-700">Off</span>
-                    <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer" data-field="push_notifications"><ion-icon name="create-outline"></ion-icon></span>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Share Activity</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="share_activity" class="text-gray-700 text-sm sm:text-base">Friends Only</span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="share_activity"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="preferences" class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-6 hover:shadow-md transition-shadow">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Preferences</h3>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Theme</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="theme" class="text-gray-700 text-sm sm:text-base">Light</span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="theme"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Language</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="language" class="text-gray-700 text-sm sm:text-base">English</span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="language"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="notifications" class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-6 hover:shadow-md transition-shadow">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Notifications</h3>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Email Alerts</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="email_alerts" class="text-gray-700 text-sm sm:text-base">On</span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="email_alerts"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2 sm:py-3 border-b border-gray-200 last:border-0">
+                    <span class="text-gray-600 font-medium text-sm sm:text-base">Push Notifications</span>
+                    <div class="flex items-center mt-1 sm:mt-0">
+                        <span id="push_notifications" class="text-gray-700 text-sm sm:text-base">Off</span>
+                        <span class="edit-btn text-blue-500 hover:text-blue-700 cursor-pointer ml-2" data-field="push_notifications"><ion-icon name="create-outline" class="text-lg"></ion-icon></span>
+                    </div>
                 </div>
             </div>
 
             <!-- Edit Modal -->
-            <div id="edit-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-                <div class="bg-white p-6 rounded-lg shadow-xl w-11/12 max-w-md">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Edit <span id="modal-field"></span></h3>
-                    <input type="text" id="modal-value" placeholder="Enter new value" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:border-blue-500 focus:outline-none">
-                    <input type="file" id="modal-file" accept="image/*" class="w-full p-2 border border-gray-300 rounded-md mb-4 hidden">
-                    <img id="modal-preview" class="w-24 h-24 rounded-full object-cover mt-2 hidden" alt="Preview">
-                    <div id="password-confirm" class="hidden mt-4 relative">
+            <div id="edit-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 px-4">
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-md">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Edit <span id="modal-field"></span></h3>
+                    <input type="text" id="modal-value" placeholder="Enter new value" class="w-full p-2 border border-gray-300 rounded-md mb-3 sm:mb-4 focus:border-blue-500 focus:outline-none">
+                    <input type="file" id="modal-file" accept="image/*" class="w-full p-2 border border-gray-300 rounded-md mb-3 sm:mb-4 hidden">
+                    <img id="modal-preview" class="w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover mt-2 hidden" alt="Preview">
+                    <div id="password-confirm" class="hidden mt-3 sm:mt-4 relative">
                         <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
                         <input type="password" id="current_password" name="current_password" class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none pr-10">
                         <span id="toggle-password" class="absolute right-3 top-8 text-gray-500 cursor-pointer">
-                            <ion-icon name="eye-outline" class="text-xl"></ion-icon>
+                            <ion-icon name="eye-outline" class="text-lg sm:text-xl"></ion-icon>
                         </span>
                     </div>
-                    <div class="mt-6 flex justify-end space-x-2">
-                        <button id="save-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Save</button>
-                        <button id="cancel-btn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Cancel</button>
+                    <div class="mt-4 sm:mt-6 flex justify-end space-x-2">
+                        <button id="save-btn" class="bg-blue-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-md hover:bg-blue-600 text-sm sm:text-base">Save</button>
+                        <button id="cancel-btn" class="bg-gray-200 text-gray-700 px-3 py-1 sm:px-4 sm:py-2 rounded-md hover:bg-gray-300 text-sm sm:text-base">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -127,4 +170,5 @@
     <script src="/sphere/scripts/script.js" defer></script>
     <script src="/sphere/scripts/settings.js"></script>
 </body>
+
 </html>

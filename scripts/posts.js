@@ -81,7 +81,7 @@ async function createPostElement(post, index) {
             ${images}
             <div class="mt-4">
                 <h3 class="post-title text-xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">${post.title}</h3>
-                <p class="post-content text-gray-600 text-sm mt-2 cursor-pointer transition-all duration-300" data-full="${post.content}">${truncatedContent}</p>
+                <p class="post-content text-gray-600 text-sm mt-2 cursor-pointer transition-all duration-300 whitespace-pre-wrap" data-full="${post.content}">${truncatedContent}</p>
                 ${isTruncated ? '<button class="toggle-content-btn text-blue-500 hover:text-blue-600 text-sm mt-2 font-medium transition-colors">Read More</button>' : ''}
             </div>
         </div>
@@ -255,7 +255,7 @@ document.addEventListener('click', (event) => {
 function createCommentHTML(comment, currentUserId) {
     return `
         <div class="comment flex items-start space-x-2 border-b" data-comment-id="${comment.id}">
-            <p class="text-gray-600 text-sm">${comment.content} <span class="text-gray-500 text-xs">- @${comment.user_name || comment.username} (${new Date(comment.created_at).toLocaleString()})</span>
+            <p class="text-gray-600 text-sm">${comment.content} <span class="text-gray-500 text-xs">- <a href="/sphere/profile.html?user=@${comment.username}"> @${comment.user_name || comment.username} </a> (${new Date(comment.created_at).toLocaleString()})</span>
                 ${comment.user_id === currentUserId ? `
                     <button class="edit-comment-btn text-blue-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Edit</button>
                     <button class="delete-comment-btn text-red-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Delete</button>

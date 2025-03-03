@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // Fetch user data
     try {
         const response = await fetch('/sphere/api/get_user_settings.php', {
             credentials: 'include'
@@ -19,13 +18,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('first_name').textContent = data.data.first_name;
         document.getElementById('last_name').textContent = data.data.last_name;
         document.getElementById('profile_picture').src = data.data.profile_picture || '/sphere/images/profile/default-avatar.png';
+        document.getElementById('cover_photo').src = data.data.cover_photo || '/sphere/images/covers/default-cover-photo.png'; // Add default cover image
+        document.getElementById('description').textContent = data.data.description || 'No description set';
     } catch (error) {
         console.error('Error fetching settings:', error);
         alert('An error occurred while loading settings.');
         window.location.href = 'login.html';
     }
 
-    // Modal setup
     const modal = document.getElementById('edit-modal');
     const modalField = document.getElementById('modal-field');
     const modalValue = document.getElementById('modal-value');
@@ -43,12 +43,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const field = btn.dataset.field;
             modalField.textContent = field.replace(/_/g, ' ').toUpperCase();
 
-            // Handle profile picture differently
-            if (field === 'profile_picture') {
+            if (field === 'profile_picture' || field === 'cover_photo') {
                 modalValue.style.display = 'none';
                 modalFile.style.display = 'block';
                 modalPreview.style.display = 'block';
-                modalPreview.src = document.getElementById('profile_picture').src;
+                modalPreview.src = document.getElementById(field).src;
             } else {
                 modalValue.style.display = 'block';
                 modalFile.style.display = 'none';
@@ -58,9 +57,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             passwordConfirm.style.display = sensitiveFields.includes(field) ? 'block' : 'none';
             modal.classList.remove('hidden');
-            currentPassword.value = ''; // Reset password field
+            currentPassword.value = '';
 
-            // Preview uploaded image
             modalFile.onchange = (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -70,7 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             };
 
-            // Toggle password visibility
             let isPasswordVisible = false;
             togglePassword.onclick = () => {
                 isPasswordVisible = !isPasswordVisible;
@@ -84,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const formData = new FormData();
                 formData.append('field', field);
 
-                if (field === 'profile_picture') {
+                if (field === 'profile_picture' || field === 'cover_photo') {
                     const file = modalFile.files[0];
                     if (!file) {
                         alert('Please select an image.');
@@ -118,9 +115,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const data = await response.json();
 
                     if (data.success) {
-                        if (field === 'profile_picture') {
+                        if (field === 'profile_picture' || field === 'cover_photo') {
                             const file = modalFile.files[0];
-                            document.getElementById('profile_picture').src = URL.createObjectURL(file);
+                            document.getElementById(field).src = URL.createObjectURL(file);
                         } else {
                             document.getElementById(field).textContent = modalValue.value;
                         }
@@ -138,13 +135,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     cancelBtn.addEventListener('click', () => {
         modal.classList.add('hidden');
-        modalFile.value = ''; // Reset file input
+        modalFile.value = '';
     });
 
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.classList.add('hidden');
-            modalFile.value = ''; // Reset file input
+            modalFile.value = '';
         }
     });
 });

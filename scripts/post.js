@@ -63,7 +63,7 @@ async function createPostElement(post, index) {
     const postElement = document.createElement('div');
     postElement.className = 'post-card bg-white rounded-xl shadow-lg p-6 mb-8 transition-all duration-300 hover:shadow-xl';
     const isTruncated = post.content.split(' ').length > 15;
-    const truncatedContent = truncateContent(post.content, 15);
+    // const truncatedContent = truncateContent(post.content, 15);
     const images = createImageCarousel(post.images, post.title, index);
     const commentsList = post.comments || [];
     const visibleComments = commentsList.slice(0, 2);
@@ -97,11 +97,10 @@ async function createPostElement(post, index) {
             ${images}
             <div class="mt-4">
                 <h3 class="post-title text-xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">${post.title}</h3>
-                <p class="post-content text-gray-600 text-sm mt-2 cursor-pointer transition-all duration-300" data-full="${post.content}">${truncatedContent}</p>
-                ${isTruncated ? '<button class="toggle-content-btn text-blue-500 hover:text-blue-600 text-sm mt-2 font-medium transition-colors">Read More</button>' : ''}
+                <p class="post-content text-gray-600 text-sm mt-2 cursor-pointer transition-all duration-300 whitespace-pre-wrap" data-full="${post.content}">${post.content}</p>
             </div>
         </div>
-        <div class="comments-section border-t border-gray-100 pt-4 pb-4 hidden" data-post-id="${post.id}">
+        <div class="comments-section border-t border-gray-100 pt-4 pb-4" data-post-id="${post.id}">
             <textarea class="comment-input w-full p-3 border border-gray-200 rounded-lg resize-none text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Add a comment..."></textarea>
             <button class="submit-comment-btn mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">Post</button>
         </div>
@@ -120,33 +119,6 @@ async function createPostElement(post, index) {
             ${hasMoreComments ? `<button class="view-more-comments-btn text-blue-500 hover:text-blue-600 text-sm mt-3 font-medium transition-colors">View More Comments (${commentsList.length - 2})</button>` : ''}
         </div>
     `;
-
-    const title = postElement.querySelector('.post-title');
-    const content = postElement.querySelector('.post-content');
-    const toggleBtn = postElement.querySelector('.toggle-content-btn');
-    const toggleContent = () => {
-        if (content.textContent === truncatedContent) {
-            content.textContent = post.content;
-            if (toggleBtn) toggleBtn.textContent = 'Show Less';
-        } else {
-            content.textContent = truncatedContent;
-            if (toggleBtn) toggleBtn.textContent = 'Read More';
-        }
-    };
-
-    [title, content].forEach(element => {
-        element.addEventListener('click', toggleContent);
-    });
-    if (toggleBtn) toggleBtn.addEventListener('click', toggleContent);
-
-    const imageElements = postElement.querySelectorAll('.swiper-container, img');
-    imageElements.forEach(element => {
-        element.classList.add('cursor-pointer');
-        element.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showPostModal(post);
-        });
-    });
 
     const reactionBtn = postElement.querySelector('.reaction-btn');
     if (reactionBtn) reactionBtn.addEventListener('click', () => handleLike(post, postElement));
@@ -182,79 +154,6 @@ async function createPostElement(post, index) {
     return postElement;
 }
 
-function showPostModal(post) {
-    let modal = document.getElementById('post-modal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'post-modal';
-        modal.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-start justify-center z-50 p-4 overflow-y-auto transition-opacity duration-300';
-        document.body.appendChild(modal);
-    }
-
-    modal.innerHTML = `
-        <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-3xl my-8 transform transition-all duration-300 scale-95">
-            <div class="relative p-6">
-                <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors p-2 rounded-full hover:bg-gray-100 z-10">
-                    <ion-icon name="close-outline" class="text-2xl"></ion-icon>
-                </button>
-                <div class="flex items-center space-x-3 mb-6">
-                    <img src="${post.author.profile_picture || '/sphere/images/profile/default-avatar.png'}" class="w-12 h-12 rounded-full object-cover border-2 border-gray-200">
-                    <div>
-                        <span class="text-gray-800 font-semibold text-lg">@${post.author.username}</span>
-                        <span class="text-gray-500 text-sm block">${new Date(post.posted_at).toLocaleDateString()}</span>
-                    </div>
-                </div>
-                ${createImageCarousel(post.images, post.title, 'modal')}
-                <h2 class="text-2xl font-bold text-gray-900 mt-6 mb-4 leading-tight">${post.title}</h2>
-                <p class="text-gray-700 text-base leading-relaxed mb-6 whitespace-pre-wrap">${post.content}</p>
-                <div class="flex items-center space-x-4 border-t border-gray-100 pt-4">
-                    <button class="reaction-btn flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors" data-post-id="${post.id}">
-                        <ion-icon name="${post.user_liked ? 'heart' : 'heart-outline'}" class="text-xl" style="color: ${post.user_liked ? 'oklch(0.623 0.214 259.815)' : 'inherit'};"></ion-icon>
-                        <span class="like-count font-medium">${post.like_count}</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-
-    modal.classList.remove('hidden');
-    setTimeout(() => modal.querySelector('.modal-content').classList.remove('scale-95'), 10);
-
-    if (post.images && post.images.length >= 2) {
-        new Swiper('#swiper-container-modal', {
-            loop: true,
-            pagination: { el: '#swiper-container-modal .swiper-pagination', clickable: true },
-            navigation: {
-                nextEl: '#swiper-container-modal .swiper-button-next',
-                prevEl: '#swiper-container-modal .swiper-button-prev'
-            },
-            slidesPerView: 1,
-            slidesPerGroup: 1
-        });
-    }
-
-    const closeBtn = modal.querySelector('#close-modal-btn');
-    closeBtn.addEventListener('click', () => {
-        modal.querySelector('.modal-content').classList.add('scale-95');
-        setTimeout(() => modal.classList.add('hidden'), 300);
-    });
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.querySelector('.modal-content').classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-    });
-
-    const modalReactionBtn = modal.querySelector('.reaction-btn');
-    if (modalReactionBtn) {
-        modalReactionBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            handleLike(post, modal);
-        });
-    }
-}
-
 document.addEventListener('click', (event) => {
     const submenus = document.querySelectorAll('.submenu');
     submenus.forEach(submenu => {
@@ -268,7 +167,7 @@ document.addEventListener('click', (event) => {
 function createCommentHTML(comment, currentUserId) {
     return `
         <div class="comment flex items-start space-x-2 border-b" data-comment-id="${comment.id}">
-            <p class="text-gray-600 text-sm">${comment.content} <span class="text-gray-500 text-xs">- @${comment.user_name || comment.username} (${new Date(comment.created_at).toLocaleString()})</span>
+            <p class="text-gray-600 text-sm">${comment.content} <span class="text-gray-500 text-xs">- <a href="/sphere/profile.html?user=@${comment.username}"> @${comment.user_name || comment.username} </a> (${new Date(comment.created_at).toLocaleString()})</span>
                 ${comment.user_id === currentUserId ? `
                     <button class="edit-comment-btn text-blue-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Edit</button>
                     <button class="delete-comment-btn text-red-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Delete</button>
@@ -280,7 +179,7 @@ function createCommentHTML(comment, currentUserId) {
 
 function createImageCarousel(images, title, index) {
     if (!images?.length) return '';
-    const imageClasses = 'w-full h-48 object-cover rounded-lg';
+    const imageClasses = 'w-full object-cover rounded-lg';
     return images.length > 1 ? `
         <div id="swiper-container-${index}" class="swiper-container mb-4 max-w-full">
             <div class="swiper-wrapper">

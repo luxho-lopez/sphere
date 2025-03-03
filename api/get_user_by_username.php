@@ -14,8 +14,11 @@ try {
     $pdo = getDBConnection();
     
     $stmt = $pdo->prepare("
-        SELECT * FROM users WHERE username = ? AND status = 'active'
+        SELECT id, username, first_name, last_name, email, profile_picture, cover_photo, description
+        FROM users 
+        WHERE username = ? AND status = 'active'
     ");
+    
     $stmt->execute([$username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 

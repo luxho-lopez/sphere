@@ -1,3 +1,5 @@
+let isFollowing = false; // Global variable to track follow state
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded in profile.js, starting profile load');
     setupMenuToggle();
@@ -23,6 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const user = await fetchProfileByUsername(username || await getCurrentUsername());
             if (user) {
                 await fetchUserPosts(user.id);
+                isFollowing = await checkFollowingStatus(user.id);
+                updateFollowButton(); // Update button text based on initial state
+                setupFollowButton(user.id); // Set up the follow button event listener
+                await fetchFollowerCount(user.id); // Fetch and display follower count
             }
             console.log('Profile load completed');
         } catch (error) {
@@ -57,7 +63,7 @@ async function fetchProfileByUsername(username) {
         profileSection.innerHTML = `
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-colors duration-200">
                 <div class="relative h-48">
-                    <img src="https://res.cloudinary.com/djv4xa6wu/image/upload/v1735722161/AbhirajK/Abhirajk2.webp" alt="Cover" class="w-full h-full object-cover">
+                    <img src="${user.cover_photo || '/sphere/images/covers/default-cover-photo.png'}" alt="Cover" class="w-full h-full object-cover">
                     <div class="absolute -bottom-12 left-6">
                         <img src="${user.profile_picture || '/sphere/images/profile/default-avatar.png'}" alt="${user.first_name}" class="w-24 h-24 rounded-xl object-cover border-4 border-white dark:border-gray-800 shadow-lg">
                     </div>
@@ -69,19 +75,17 @@ async function fetchProfileByUsername(username) {
                             <p class="text-blue-600 dark:text-blue-400">@${user.username}</p>
                         </div>
                         <div>
-                            <a href="#" class="inline-flex items-center mb-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium">
-                                Keep
+                            <button id="follow-btn" class="inline-flex items-center mb-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium">
+                                Follow
                                 <ion-icon class="ml-2" name="person-add-outline"></ion-icon>
-                            </a>
-                            <a href="#" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium">
+                            </button>
+                            <button class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium">
                                 Message
                                 <ion-icon class="ml-2" name="paper-plane-outline"></ion-icon>
-                            </a>
+                            </button>
                         </div>
                     </div>
-                    <p class="mt-6 text-gray-600 dark:text-gray-300">
-                        Hi, I'm a member of the Sphere community. Check out my posts below!
-                    </p>
+                    <p class="mt-6 text-gray-600 dark:text-gray-300">${user.description || 'Hi, I\'m a member of the Sphere community. Check out my posts below!'}</p>
                     <div class="mt-6">
                         <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Contact</h2>
                         <a href="mailto:${user.email}" class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline">
@@ -91,6 +95,10 @@ async function fetchProfileByUsername(username) {
                             ${user.email}
                         </a>
                     </div>
+                    <div class="mt-6">
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Followers</h2>
+                        <span id="follower-count" class="text-gray-700">0</span>
+                    </div>
                 </div>
             </div>
         `;
@@ -99,6 +107,103 @@ async function fetchProfileByUsername(username) {
     } catch (error) {
         console.error('Error fetching user profile:', error);
         throw error;
+    }
+}
+
+async function checkFollowingStatus(followingId) {
+    try {
+        const response = await fetch(`/sphere/api/check_follow.php?following_id=${followingId}`, {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        return data.success && data.is_following;
+    } catch (error) {
+        console.error('Error checking follow status:', error);
+        return false;
+    }
+}
+
+async function toggleFollow(userId) {
+    const currentUserId = await getCurrentUserId();
+    if (!currentUserId) {
+        alert('You must be logged in to follow users.');
+        return;
+    }
+    if (currentUserId === userId) {
+        alert('You cannot follow yourself.');
+        return;
+    }
+
+    const action = isFollowing ? 'unfollow' : 'follow';
+    if (action === 'unfollow') {
+        const confirmUnfollow = confirm('Are you sure you want to unfollow this user?');
+        if (!confirmUnfollow) return;
+    }
+
+    const payload = { following_id: userId };
+    console.log(`Sending ${action} request with payload:`, payload);
+
+    try {
+        const response = await fetch(`/sphere/api/${action}.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            credentials: 'include'
+        });
+        
+        const rawResponse = await response.text();
+        console.log(`Raw response from ${action}.php:`, rawResponse);
+
+        const data = JSON.parse(rawResponse);
+        if (data.success) {
+            isFollowing = !isFollowing;
+            updateFollowButton();
+            if (action === 'follow') {
+                alert('You are now following this user!');
+            }
+            await fetchFollowerCount(userId);
+        } else {
+            console.error(`${action} failed:`, data.message);
+            alert(`Failed to ${action}: ${data.message}`);
+        }
+    } catch (error) {
+        console.error(`Error during ${action}:`, error);
+        alert(`An error occurred while trying to ${action}. Please try again.`);
+    }
+}
+
+function updateFollowButton() {
+    const btn = document.getElementById('follow-btn');
+    if (btn) {
+        if (isFollowing) {
+            // Styling when following
+            btn.innerHTML = `Following <ion-icon class="ml-2" name="checkmark-circle-outline"></ion-icon>`;
+            btn.className = 'inline-flex items-center mb-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition-colors duration-200 text-sm font-medium';
+        } else {
+            // Styling when not following
+            btn.innerHTML = `Follow <ion-icon class="ml-2" name="person-add-outline"></ion-icon>`;
+            btn.className = 'inline-flex items-center mb-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium';
+        }
+    }
+}
+
+function setupFollowButton(userId) {
+    console.log('Setting up follow button with userId:', userId);
+    const btn = document.getElementById('follow-btn');
+    if (btn) {
+        btn.addEventListener('click', () => toggleFollow(userId));
+    }
+}
+
+async function fetchFollowerCount(userId) {
+    try {
+        const response = await fetch(`/sphere/api/get_followers.php?user_id=${userId}`, { credentials: 'include' });
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('follower-count').textContent = data.follower_count;
+        }
+    } catch (error) {
+        console.error('Error fetching follower count:', error);
     }
 }
 
@@ -185,7 +290,7 @@ async function createPostElement(post, index) {
             ${images}
             <div class="mt-4">
                 <h3 class="post-title text-xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors">${post.title}</h3>
-                <p class="post-content text-gray-600 text-sm mt-2 cursor-pointer transition-all duration-300" data-full="${post.content}">${truncatedContent}</p>
+                <p class="post-content text-gray-600 text-sm mt-2 cursor-pointer transition-all duration-300 whitespace-pre-wrap" data-full="${post.content}">${truncatedContent}</p>
                 ${isTruncated ? '<button class="toggle-content-btn text-blue-500 hover:text-blue-600 text-sm mt-2 font-medium transition-colors">Read More</button>' : ''}
             </div>
         </div>
@@ -358,7 +463,7 @@ document.addEventListener('click', (event) => {
 function createCommentHTML(comment, currentUserId) {
     return `
         <div class="comment flex items-start space-x-2 border-b" data-comment-id="${comment.id}">
-            <p class="text-gray-600 text-sm">${comment.content} <span class="text-gray-500 text-xs">- @${comment.user_name || comment.username} (${new Date(comment.created_at).toLocaleString()})</span>
+            <p class="text-gray-600 text-sm">${comment.content} <span class="text-gray-500 text-xs">- <a href="/sphere/profile.html?user=@${comment.username}"> @${comment.user_name || comment.username} </a> (${new Date(comment.created_at).toLocaleString()})</span>
                 ${comment.user_id === currentUserId ? `
                     <button class="edit-comment-btn text-blue-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Edit</button>
                     <button class="delete-comment-btn text-red-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Delete</button>

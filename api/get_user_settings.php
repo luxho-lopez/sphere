@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 try {
     $pdo = getDBConnection();
     $stmt = $pdo->prepare("
-        SELECT email, phone, username, first_name, last_name, profile_picture 
+        SELECT email, phone, username, first_name, last_name, profile_picture, cover_photo, description 
         FROM users 
         WHERE id = ? AND status = 'active'
     ");

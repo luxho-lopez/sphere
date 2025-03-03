@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function fetchNotifications() {
     const notificationsList = document.getElementById('notifications-list');
+    const unreadCountBadge = document.getElementById('unread-count');
     if (!notificationsList) {
         console.log('Notifications list not found on this page');
         return;
@@ -28,9 +29,10 @@ async function fetchNotifications() {
         const data = await response.json();
         
         if (data.success && data.notifications?.length) {
+            const unreadCount = data.notifications.filter(notif => !notif.is_read).length;
             notificationsList.innerHTML = data.notifications.map(notif => `
-                <div class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-b ${
-                    notif.is_read ? '' : 'font-bold bg-gray-50'
+                <a href="/sphere/post.html?post_id=${notif.post_id || ''}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100 transition-colors duration-150 ${
+                    notif.is_read ? '' : 'font-semibold bg-gray-50'
                 }" data-notification-id="${notif.id}">
                     <div class="flex justify-between items-center">
                         <div>
@@ -43,15 +45,25 @@ async function fetchNotifications() {
                             <ion-icon name="${notif.is_read ? 'eye-off-outline' : 'eye-outline'}" class="ml-2" size="small"></ion-icon>
                         </button>
                     </div>
-                </div>
+                </a>
             `).join('');
+
+            // Update unread count badge
+            if (unreadCount > 0) {
+                unreadCountBadge.textContent = unreadCount;
+                unreadCountBadge.classList.remove('hidden');
+            } else {
+                unreadCountBadge.classList.add('hidden');
+            }
             
+            // Add event listeners for toggle buttons (unchanged)
             notificationsList.querySelectorAll('.toggle-read-btn').forEach(btn => {
                 btn.addEventListener('click', async function(e) {
                     e.stopPropagation();
+                    e.preventDefault();
                     const notificationDiv = this.closest('[data-notification-id]');
                     const notificationId = notificationDiv.dataset.notificationId;
-                    const currentState = !notificationDiv.classList.contains('font-bold');
+                    const currentState = !notificationDiv.classList.contains('font-semibold');
                     const newState = !currentState;
                 
                     this.disabled = true;
@@ -60,7 +72,7 @@ async function fetchNotifications() {
                     const success = await toggleNotificationRead(notificationId, newState);
                     
                     if (success) {
-                        notificationDiv.classList.toggle('font-bold', !newState);
+                        notificationDiv.classList.toggle('font-semibold', !newState);
                         notificationDiv.classList.toggle('bg-gray-50', !newState);
                         this.classList.toggle('text-blue-500', newState);
                         this.classList.toggle('text-gray-500', !newState);
@@ -68,6 +80,12 @@ async function fetchNotifications() {
                             newState ? 'eye-off-outline' : 'eye-outline');
                         this.setAttribute('title', 
                             newState ? 'Mark as unread' : 'Mark as read');
+                        // Update unread count after toggling
+                        const updatedResponse = await fetch('/sphere/api/get_notifications.php', { credentials: 'include' });
+                        const updatedData = await updatedResponse.json();
+                        const newUnreadCount = updatedData.notifications.filter(n => !n.is_read).length;
+                        unreadCountBadge.textContent = newUnreadCount;
+                        unreadCountBadge.classList.toggle('hidden', newUnreadCount === 0);
                     }
                     
                     this.disabled = false;
@@ -76,18 +94,20 @@ async function fetchNotifications() {
             });
         } else {
             notificationsList.innerHTML = `
-                <div class="px-4 py-2 text-sm text-gray-500">
+                <div class="px-4 py-3 text-sm text-gray-500">
                     No new notifications
                 </div>
             `;
+            unreadCountBadge.classList.add('hidden');
         }
     } catch (error) {
         console.error('Error fetching notifications:', error);
         notificationsList.innerHTML = `
-            <div class="px-4 py-2 text-sm text-gray-500">
+            <div class="px-4 py-3 text-sm text-gray-500">
                 Unable to load notifications
             </div>
         `;
+        unreadCountBadge.classList.add('hidden');
     }
 }
 
@@ -134,13 +154,15 @@ async function fetchUserProfile() {
         const user = data.success && data.user?.length ? data.user[0] : null;
 
         if (logoContainer) {
-            logoContainer.innerHTML = `
-                <a href="/sphere/index.html"><h1 class="text-2xl font-bold text-gray-800">Sphere</h1></a>
-                <button class="menu-toggle md:hidden text-gray-600 hover:text-gray-800 focus:outline-none flex items-end">
-                    <ion-icon name="menu-outline" class="text-2xl"></ion-icon>
-                </button>
-            `;
-            setupMenuToggle();
+            const logoLink = logoContainer.querySelector('a');
+            if (!logoLink.querySelector('.menu-toggle')) {
+                logoLink.insertAdjacentHTML('afterend', `
+                    <button class="menu-toggle md:hidden text-gray-600 hover:text-gray-800 focus:outline-none flex items-end">
+                        <ion-icon name="menu-outline" class="text-2xl"></ion-icon>
+                    </button>
+                `);
+                setupMenuToggle();
+            }
         }
 
         if (user && profileHeader) {
@@ -148,10 +170,10 @@ async function fetchUserProfile() {
                 <a href="/sphere/profile.html?user=@${user.username}" class="user-profile-link flex items-center space-x-2">
                     <img src="${user.profile_picture || '/sphere/images/profile/default-avatar.png'}" alt="${user.first_name}" class="w-8 h-8 rounded-full object-cover">
                 </a>
-                <ul class="sub-menu absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-40 hidden">
-                    <li><a href="/sphere/profile.html?user=@${user.username}" class="flex items-center block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm"><ion-icon class="mx-2" name="person-circle-outline"></ion-icon> ${user.first_name}</a></li>
-                    <li><a href="/sphere/settings.html" class="flex items-center block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm"><ion-icon class="mx-2" name="cog-outline"></ion-icon> Settings</a></li>
-                    <li><a href="/sphere/api/logout.php" class="flex items-center block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm"><ion-icon class="mx-2" name="power-outline"></ion-icon> Log out</a></li>
+                <ul class="sub-menu absolute right-0 mt-3 w-60 bg-white shadow-lg rounded-xl border border-gray-100 z-50 hidden transition-all duration-200 ease-in-out">
+                    <li><a href="/sphere/profile.html?user=@${user.username}" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150"><ion-icon class="mx-2 text-lg" name="person-circle-outline"></ion-icon> ${user.first_name}</a></li>
+                    <li><a href="/sphere/settings.html" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150"><ion-icon class="mx-2 text-lg" name="cog-outline"></ion-icon> Settings</a></li>
+                    <li><a href="/sphere/api/logout.php" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150 rounded-b-xl"><ion-icon class="mx-2 text-lg" name="power-outline"></ion-icon> Log out</a></li>
                 </ul>
             `;
             if (profileLink) profileLink.classList.remove('hidden');
@@ -244,7 +266,7 @@ function restrictUnauthorizedURLs() {
     const validPaths = [
         '/sphere/index.html', '/sphere/profile.html', '/sphere/new_post.html',
         '/sphere/settings.html', '/sphere/trending.html', '/sphere/explorer.html',
-        '/sphere/all_posts.html', '/sphere/post.html', '/sphere/login.html', '/sphere/register.html',
+        '/sphere/post.html', '/sphere/login.html', '/sphere/register.html',
         '/sphere/edit_post.html', '/sphere/forgot_password.html'
     ];
     const currentPath = window.location.pathname;

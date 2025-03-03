@@ -9,7 +9,10 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $pdo = getDBConnection();
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT id, username, first_name, last_name, email, profile_picture, cover_photo, description 
+                    FROM users 
+                    WHERE id = ?");
+                    
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
