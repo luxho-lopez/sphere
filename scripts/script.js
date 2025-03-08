@@ -30,23 +30,30 @@ async function fetchNotifications() {
         
         if (data.success && data.notifications?.length) {
             const unreadCount = data.notifications.filter(notif => !notif.is_read).length;
-            notificationsList.innerHTML = data.notifications.map(notif => `
-                <a href="/sphere/post.html?post_id=${notif.post_id || ''}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100 transition-colors duration-150 ${
-                    notif.is_read ? '' : 'font-semibold bg-gray-50'
-                }" data-notification-id="${notif.id}">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <span>${notif.message}</span>
-                            <span class="text-xs text-gray-500 block">${new Date(notif.timestamp).toLocaleString()}</span>
-                        </div>
+            notificationsList.innerHTML = data.notifications.map(notif => {
+                // Determinar la URL de redirección basada en el tipo de notificación
+                const redirectUrl = notif.type === 'follow' 
+                    ? `/sphere/profile.html?user=@${notif.reference}` 
+                    : `/sphere/post.html?post_id=${notif.reference || ''}`;
+
+                return `
+                    <div class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100 transition-colors duration-150 ${
+                        notif.is_read ? '' : 'font-semibold bg-gray-50'
+                    }" data-notification-id="${notif.id}">
+                        <a href="${redirectUrl}" class="flex justify-between items-center">
+                            <div>
+                                <span>${notif.message}</span>
+                                <span class="text-xs text-gray-500 block">${new Date(notif.timestamp).toLocaleString()}</span>
+                            </div>
+                        </a>
                         <button class="toggle-read-btn text-xs ${
                             notif.is_read ? 'text-blue-500' : 'text-gray-500'
                         }" title="${notif.is_read ? 'Mark as unread' : 'Mark as read'}">
                             <ion-icon name="${notif.is_read ? 'eye-off-outline' : 'eye-outline'}" class="ml-2" size="small"></ion-icon>
                         </button>
                     </div>
-                </a>
-            `).join('');
+                `;
+            }).join('');
 
             // Update unread count badge
             if (unreadCount > 0) {
@@ -56,7 +63,7 @@ async function fetchNotifications() {
                 unreadCountBadge.classList.add('hidden');
             }
             
-            // Add event listeners for toggle buttons (unchanged)
+            // Add event listeners for toggle buttons
             notificationsList.querySelectorAll('.toggle-read-btn').forEach(btn => {
                 btn.addEventListener('click', async function(e) {
                     e.stopPropagation();
