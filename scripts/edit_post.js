@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!postId) {
         alert('No post ID provided');
-        window.location.href = '/sphere/index.html';
+        window.location.href = '/main/index.html';
         return;
     }
 
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadPostData(postId) {
     try {
-        const response = await fetch('/sphere/api/posts.php', {
+        const response = await fetch('/main/api/posts.php', {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
@@ -30,7 +30,7 @@ async function loadPostData(postId) {
 
         if (!post) {
             alert('Post not found');
-            window.location.href = '/sphere/index.html';
+            window.location.href = '/main/index.html';
             return;
         }
 
@@ -39,7 +39,7 @@ async function loadPostData(postId) {
     } catch (error) {
         console.error('Error loading post data:', error);
         alert('Error loading post');
-        window.location.href = '/sphere/index.html';
+        window.location.href = '/main/index.html';
     }
 }
 
@@ -53,7 +53,7 @@ async function savePostChanges(postId) {
     };
 
     try {
-        const response = await fetch('/sphere/api/edit_post.php', {
+        const response = await fetch('/main/api/edit_post.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(postData),
@@ -62,7 +62,7 @@ async function savePostChanges(postId) {
         const data = await response.json();
         if (data.success) {
             alert('Post updated successfully');
-            window.location.href = '/sphere/index.html';
+            window.location.href = '/main/index.html';
         } else {
             console.error('Edit post failed:', data.message);
             alert('Failed to update post: ' + data.message);

@@ -1,5 +1,5 @@
 <?php
-// /sphere/api/update_setting.php
+// /main/api/update_setting.php
 session_start();
 header('Content-Type: application/json');
 require_once 'config.php';
@@ -43,11 +43,11 @@ try {
     // Handle file uploads for profile_picture and cover_photo
     if (($field === 'profile_picture' || $field === 'cover_photo') && isset($_FILES['value'])) {
         $uploadDir = $field === 'profile_picture' 
-            ? $_SERVER['DOCUMENT_ROOT'] . '/sphere/images/profile/' 
-            : $_SERVER['DOCUMENT_ROOT'] . '/sphere/images/covers/';
+            ? $_SERVER['DOCUMENT_ROOT'] . '/main/images/profile/' 
+            : $_SERVER['DOCUMENT_ROOT'] . '/main/images/covers/';
         $urlBase = $field === 'profile_picture' 
-            ? '/sphere/images/profile/' 
-            : '/sphere/images/covers/';
+            ? '/main/images/profile/' 
+            : '/main/images/covers/';
 
         if (!file_exists($uploadDir)) {
             mkdir($uploadDir, 0777, true);

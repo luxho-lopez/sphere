@@ -1,5 +1,5 @@
 <?php
-// /sphere/api/get_notifications.php
+// /main/api/get_notifications.php
 session_start();
 header('Content-Type: application/json');
 

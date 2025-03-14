@@ -1,5 +1,5 @@
 <?php
-// /sphere/api/delete_like.php
+// /main/api/delete_like.php
 session_start();
 header('Content-Type: application/json');
 require_once 'config.php';

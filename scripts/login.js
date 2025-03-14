@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const response = await fetch('/sphere/api/login.php', {
+                const response = await fetch('/main/api/login.php', {
                     method: 'POST',
                     body: formData
                 });

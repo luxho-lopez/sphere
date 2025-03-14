@@ -19,7 +19,7 @@ async function fetchSinglePost(postId) {
     }
 
     try {
-        const response = await fetch(`/sphere/api/get_post.php?post_id=${encodeURIComponent(postId)}`, {
+        const response = await fetch(`/main/api/get_post.php?post_id=${encodeURIComponent(postId)}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
@@ -75,8 +75,8 @@ async function createPostElement(post, index) {
     postElement.innerHTML = `
         <div class="flex justify-between items-center mb-4">
             <div class="flex items-center space-x-3">
-                <a href="/sphere/profile.html?user=@${post.author.username}" class="flex items-center space-x-3 group">
-                    <img src="${post.author.profile_picture || '/sphere/images/profile/default-avatar.png'}" class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 transition-transform group-hover:scale-105">
+                <a href="/main/profile.html?user=@${post.author.username}" class="flex items-center space-x-3 group">
+                    <img src="${post.author.profile_picture || '/main/images/profile/default-avatar.png'}" class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 transition-transform group-hover:scale-105">
                     <div>
                         <span class="text-gray-800 font-semibold text-sm group-hover:text-blue-600 transition-colors">@${post.author.username}</span>
                         <span class="text-gray-500 text-xs block">${new Date(post.posted_at).toLocaleDateString()}</span>
@@ -169,7 +169,7 @@ function createCommentHTML(comment, currentUserId) {
         <div class="comment flex flex-col items-start space-x-2 border-b" data-comment-id="${comment.id}">
             <p class="text-gray-600 text-sm">${comment.content} </p>
             <span class="text-gray-500 text-xs">
-                <a href="/sphere/profile.html?user=@${comment.username}">@${comment.username || comment.username} </a> (${new Date(comment.created_at).toLocaleString()})
+                <a href="/main/profile.html?user=@${comment.username}">@${comment.username || comment.username} </a> (${new Date(comment.created_at).toLocaleString()})
                 ${comment.user_id === currentUserId ? `
                     <button class="edit-comment-btn text-blue-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Edit</button>
                     <button class="delete-comment-btn text-red-500 hover:underline text-xs ml-2" data-comment-id="${comment.id}">Delete</button>
@@ -196,7 +196,7 @@ function createImageCarousel(images, title, index) {
 }
 
 async function handleLike(post, element) {
-    const url = post.user_liked ? '/sphere/api/delete_like.php' : '/sphere/api/save_like.php';
+    const url = post.user_liked ? '/main/api/delete_like.php' : '/main/api/save_like.php';
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -247,7 +247,7 @@ async function handleComment(postId, postElement) {
     const content = commentInput.value.trim();
     if (!content) return;
     try {
-        const response = await fetch('/sphere/api/save_comment.php', {
+        const response = await fetch('/main/api/save_comment.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ post_id: postId, content })
@@ -307,7 +307,7 @@ async function editComment(commentId, postElement) {
     const newContent = prompt('Edit your comment:', commentText);
     if (newContent && newContent !== commentText) {
         try {
-            const response = await fetch('/sphere/api/edit_comment.php', {
+            const response = await fetch('/main/api/edit_comment.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ comment_id: commentId, content: newContent })
@@ -339,7 +339,7 @@ async function deleteComment(commentId, postElement, postId) {
     if (!confirmDelete) return;
 
     try {
-        const response = await fetch('/sphere/api/delete_comment.php', {
+        const response = await fetch('/main/api/delete_comment.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ comment_id: commentId })
@@ -369,7 +369,7 @@ async function deleteComment(commentId, postElement, postId) {
 }
 
 function updateViewMoreButton(postElement, postId) {
-    fetch('/sphere/api/posts.php', {
+    fetch('/main/api/posts.php', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
@@ -425,7 +425,7 @@ function attachCommentEventListeners(postElement, postId) {
 
 async function getCurrentUserId() {
     try {
-        const response = await fetch('/sphere/api/get_user.php', {
+        const response = await fetch('/main/api/get_user.php', {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
@@ -446,7 +446,7 @@ async function getCurrentUserId() {
 
 async function getCurrentUserName() {
     try {
-        const response = await fetch('/sphere/api/get_user.php', {
+        const response = await fetch('/main/api/get_user.php', {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
@@ -471,7 +471,7 @@ async function editPost(post) {
         alert('You do not have permission to edit this post.');
         return;
     }
-    window.location.href = `/sphere/edit_post.html?post_id=${post.id}`;
+    window.location.href = `/main/edit_post.html?post_id=${post.id}`;
 }
 
 async function deletePost(postId, postElement) {
@@ -479,7 +479,7 @@ async function deletePost(postId, postElement) {
     const confirmDelete = confirm('Are you sure you want to delete this post?');
     if (confirmDelete) {
         try {
-            const response = await fetch('/sphere/api/delete_post.php', {
+            const response = await fetch('/main/api/delete_post.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ post_id: postId })
@@ -488,7 +488,7 @@ async function deletePost(postId, postElement) {
             if (data.success) {
                 postElement.remove();
                 console.log('Post deleted successfully');
-                window.location.href = '/sphere/index.html';
+                window.location.href = '/main/index.html';
             } else {
                 console.error('Delete post failed:', data.message);
                 alert('Failed to delete post: ' + data.message);

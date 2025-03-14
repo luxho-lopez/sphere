@@ -1,5 +1,5 @@
 <?php
-// /sphere/api/config.php
+// /main/api/config.php
 define('DB_HOST', 'localhost'); // Cambia según tu host de MySQL
 define('DB_USER', 'root'); // Cambia según tu usuario de MySQL
 define('DB_PASS', '');      // Cambia según tu contraseña de MySQL

@@ -1,5 +1,5 @@
 <?php
-// /sphere/api/unfollow.php
+// /main/api/unfollow.php
 session_start();
 header('Content-Type: application/json');
 

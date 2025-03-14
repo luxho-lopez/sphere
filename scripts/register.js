@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const response = await fetch('/sphere/api/register.php', {
+                const response = await fetch('/main/api/register.php', {
                     method: 'POST',
                     body: formData
                 });

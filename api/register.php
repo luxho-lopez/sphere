@@ -1,5 +1,5 @@
 <?php
-// /sphere/api/register.php
+// /main/api/register.php
 header('Content-Type: application/json');
 
 // Disable error display to prevent HTML output
@@ -65,7 +65,7 @@ try {
         $first_name,
         $last_name,
         $hashed_password,
-        '/sphere/images/profile/default-avatar.png'
+        '/main/images/profile/default-avatar.png'
     ]);
 
     if (!$success) {

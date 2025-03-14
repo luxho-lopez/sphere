@@ -1,5 +1,5 @@
 <?php
-// /sphere/api/save_comment.php
+// /main/api/save_comment.php
 session_start();
 header('Content-Type: application/json');
 require_once 'config.php';

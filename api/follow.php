@@ -1,5 +1,5 @@
 <?php
-// /sphere/api/follow.php
+// /main/api/follow.php
 session_start();
 header('Content-Type: application/json');
 

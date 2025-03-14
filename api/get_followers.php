@@ -1,5 +1,5 @@
 <?php
-// /sphere/api/get_followers.php
+// /main/api/get_followers.php
 session_start();
 header('Content-Type: application/json');
 require_once 'config.php';

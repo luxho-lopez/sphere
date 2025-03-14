@@ -1,5 +1,5 @@
 <?php
-// /sphere/api/new_post.php
+// /main/api/new_post.php
 session_start();
 
 // Prevent any output before JSON
@@ -31,8 +31,8 @@ try {
 
     // Upload images
     if (isset($_FILES['images']) && $success) {
-        $upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/sphere/images/uploads/';
-        $url_base = '/sphere/images/uploads/';
+        $upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/main/images/uploads/';
+        $url_base = '/main/images/uploads/';
 
         if (!file_exists($upload_dir)) {
             mkdir($upload_dir, 0777, true);

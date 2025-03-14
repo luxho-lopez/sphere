@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const response = await fetch('/sphere/api/get_user_settings.php', {
+        const response = await fetch('/main/api/get_user_settings.php', {
             credentials: 'include'
         });
         const data = await response.json();
@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('username').textContent = data.data.username;
         document.getElementById('first_name').textContent = data.data.first_name;
         document.getElementById('last_name').textContent = data.data.last_name;
-        document.getElementById('profile_picture').src = data.data.profile_picture || '/sphere/images/profile/default-avatar.png';
-        document.getElementById('cover_photo').src = data.data.cover_photo || '/sphere/images/covers/default-cover-photo.png'; // Add default cover image
+        document.getElementById('profile_picture').src = data.data.profile_picture || '/main/images/profile/default-avatar.png';
+        document.getElementById('cover_photo').src = data.data.cover_photo || '/main/images/covers/default-cover-photo.png'; // Add default cover image
         document.getElementById('description').textContent = data.data.description || 'No description set';
     } catch (error) {
         console.error('Error fetching settings:', error);
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 try {
-                    const response = await fetch('/sphere/api/update_setting.php', {
+                    const response = await fetch('/main/api/update_setting.php', {
                         method: 'POST',
                         body: formData,
                         credentials: 'include'

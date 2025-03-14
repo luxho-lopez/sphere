@@ -2,7 +2,7 @@
 const headerTemplate = `
     <header class="fixed top-0 left-0 w-full bg-white shadow-md p-4 flex justify-between items-center transition-transform duration-300 z-50">
         <div class="logo flex items-center space-x-2 flex-shrink-0">
-            <a href="/sphere/index.html">
+            <a href="/main/index.html">
                 <h1 class="text-2xl font-bold text-gray-800 md:text-2xl text-lg">
                     <span class="md:inline hidden">Sphere</span>
                     <span class="md:hidden inline">S</span>
@@ -18,10 +18,10 @@ const headerTemplate = `
         </div>
         <nav class="flex-shrink-0">
             <ul id="nav-menu" class="flex items-center space-x-4 sm:space-x-6">
-                <li class="login-link"><a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800">Log In</a></li>
-                <li class="register-link"><a href="/sphere/register.html" class="text-gray-600 hover:text-gray-800">Register</a></li>
+                <li class="login-link"><a href="/main/login.html" class="text-gray-600 hover:text-gray-800">Log In</a></li>
+                <li class="register-link"><a href="/main/register.html" class="text-gray-600 hover:text-gray-800">Register</a></li>
                 <li class="new_post-link">
-                    <a href="/sphere/new_post.html" class="text-gray-600 hover:text-gray-800">
+                    <a href="/main/new_post.html" class="text-gray-600 hover:text-gray-800">
                         <span class="inline-flex shrink-0 rounded-full border border-blue-300 bg-blue-100 p-2 dark:border-blue-300/10 dark:bg-blue-400/10">
                             <ion-icon name="add-outline"></ion-icon>
                         </span>
@@ -36,7 +36,7 @@ const headerTemplate = `
                         <li class="px-4 py-3 text-sm font-semibold text-gray-800 border-b border-gray-200 bg-gray-50 rounded-t-xl">Notifications</li>
                         <li id="notifications-list" class="max-h-64 overflow-y-auto"></li>
                         <li class="px-4 py-3 text-sm text-blue-600 hover:bg-gray-100 rounded-b-xl transition-colors duration-150">
-                            <a href="/sphere/notify.html" class="block w-full">See all notifications</a>
+                            <a href="/main/notify.html" class="block w-full">See all notifications</a>
                         </li>
                     </ul>
                 </li>
@@ -56,19 +56,19 @@ const asideTemplate = `
         <nav>
             <ul id="sidebar-menu" class="space-y-3 mt-20">
                 <li>
-                    <a href="/sphere/index.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200">
+                    <a href="/main/index.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200">
                         <ion-icon name="home-outline" class="mr-4 text-xl text-gray-500"></ion-icon>
                         <span class="text-sm font-medium">Home</span>
                     </a>
                 </li>
                 <li>
-                    <a href="/sphere/trending.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200">
+                    <a href="/main/trending.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200">
                         <ion-icon name="trending-up-outline" class="mr-4 text-xl text-gray-500"></ion-icon>
                         <span class="text-sm font-medium">Trending</span>
                     </a>
                 </li>
                 <li>
-                    <a href="/sphere/explorer.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200">
+                    <a href="/main/explorer.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200">
                         <ion-icon name="planet-outline" class="mr-4 text-xl text-gray-500"></ion-icon>
                         <span class="text-sm font-medium">Explorer</span>
                     </a>
@@ -122,7 +122,7 @@ function setupSearch() {
         }
 
         try {
-            const response = await fetch(`/sphere/api/search.php?query=${encodeURIComponent(query)}`, {
+            const response = await fetch(`/main/api/search.php?query=${encodeURIComponent(query)}`, {
                 credentials: 'include'
             });
             if (!response.ok) throw new Error('Search request failed');
@@ -133,8 +133,8 @@ function setupSearch() {
                     <div class="users-section">
                         <h3 class="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 border-b">Users</h3>
                         ${data.users.length ? data.users.map(user => `
-                            <a href="/sphere/profile.html?user=@${user.username}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2">
-                                <img src="${user.profile_picture || '/sphere/images/profile/default-avatar.png'}" class="w-8 h-8 rounded-full object-cover">
+                            <a href="/main/profile.html?user=@${user.username}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2">
+                                <img src="${user.profile_picture || '/main/images/profile/default-avatar.png'}" class="w-8 h-8 rounded-full object-cover">
                                 <div>
                                     <span class="font-medium">@${user.username}</span>
                                     <span class="block text-xs text-gray-500">${user.first_name} ${user.last_name || ''}</span>
@@ -145,7 +145,7 @@ function setupSearch() {
                     <div class="posts-section">
                         <h3 class="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 border-b">Posts</h3>
                         ${data.posts.length ? data.posts.map(post => `
-                            <a href="/sphere/post.html?post_id=${post.id}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                            <a href="/main/post.html?post_id=${post.id}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                 <span class="font-medium">${post.title}</span>
                                 <span class="block text-xs text-gray-500 truncate">${post.content.substring(0, 50)}${post.content.length > 50 ? '...' : ''}</span>
                             </a>

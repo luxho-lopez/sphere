@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(form);
 
             try {
-                const response = await fetch('/sphere/api/new_post.php', {
+                const response = await fetch('/main/api/new_post.php', {
                     method: 'POST',
                     body: formData
                 });

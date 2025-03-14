@@ -21,7 +21,7 @@ async function fetchNotifications() {
         return;
     }
     try {
-        const response = await fetch('/sphere/api/get_notifications.php', {
+        const response = await fetch('/main/api/get_notifications.php', {
             credentials: 'include'
         });
         if (!response.ok) throw new Error('Failed to fetch notifications');
@@ -33,8 +33,8 @@ async function fetchNotifications() {
             notificationsList.innerHTML = data.notifications.map(notif => {
                 // Determinar la URL de redirección basada en el tipo de notificación
                 const redirectUrl = notif.type === 'follow' 
-                    ? `/sphere/profile.html?user=@${notif.reference}` 
-                    : `/sphere/post.html?post_id=${notif.reference || ''}`;
+                    ? `/main/profile.html?user=@${notif.reference}` 
+                    : `/main/post.html?post_id=${notif.reference || ''}`;
 
                 return `
                     <div class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100 transition-colors duration-150 ${
@@ -88,7 +88,7 @@ async function fetchNotifications() {
                         this.setAttribute('title', 
                             newState ? 'Mark as unread' : 'Mark as read');
                         // Update unread count after toggling
-                        const updatedResponse = await fetch('/sphere/api/get_notifications.php', { credentials: 'include' });
+                        const updatedResponse = await fetch('/main/api/get_notifications.php', { credentials: 'include' });
                         const updatedData = await updatedResponse.json();
                         const newUnreadCount = updatedData.notifications.filter(n => !n.is_read).length;
                         unreadCountBadge.textContent = newUnreadCount;
@@ -120,7 +120,7 @@ async function fetchNotifications() {
 
 async function toggleNotificationRead(notificationId, isRead) {
     try {
-        const response = await fetch('/sphere/api/mark_notification_read.php', {
+        const response = await fetch('/main/api/mark_notification_read.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -142,7 +142,7 @@ async function toggleNotificationRead(notificationId, isRead) {
 
 async function fetchUserProfile() {
     try {
-        const response = await fetch('/sphere/api/get_user.php', {
+        const response = await fetch('/main/api/get_user.php', {
             credentials: 'include'
         });
         const profileHeader = document.getElementById('user-profile');
@@ -174,13 +174,13 @@ async function fetchUserProfile() {
 
         if (user && profileHeader) {
             profileHeader.innerHTML = `
-                <a href="/sphere/profile.html?user=@${user.username}" class="user-profile-link flex items-center space-x-2">
-                    <img src="${user.profile_picture || '/sphere/images/profile/default-avatar.png'}" alt="${user.first_name}" class="w-8 h-8 rounded-full object-cover">
+                <a href="/main/profile.html?user=@${user.username}" class="user-profile-link flex items-center space-x-2">
+                    <img src="${user.profile_picture || '/main/images/profile/default-avatar.png'}" alt="${user.first_name}" class="w-8 h-8 rounded-full object-cover">
                 </a>
                 <ul class="sub-menu absolute right-0 mt-3 w-60 bg-white shadow-lg rounded-xl border border-gray-100 z-50 hidden transition-all duration-200 ease-in-out">
-                    <li><a href="/sphere/profile.html?user=@${user.username}" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150"><ion-icon class="mx-2 text-lg" name="person-circle-outline"></ion-icon> ${user.first_name}</a></li>
-                    <li><a href="/sphere/settings.html" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150"><ion-icon class="mx-2 text-lg" name="cog-outline"></ion-icon> Settings</a></li>
-                    <li><a href="/sphere/api/logout.php" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150 rounded-b-xl"><ion-icon class="mx-2 text-lg" name="power-outline"></ion-icon> Log out</a></li>
+                    <li><a href="/main/profile.html?user=@${user.username}" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150"><ion-icon class="mx-2 text-lg" name="person-circle-outline"></ion-icon> ${user.first_name}</a></li>
+                    <li><a href="/main/settings.html" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150"><ion-icon class="mx-2 text-lg" name="cog-outline"></ion-icon> Settings</a></li>
+                    <li><a href="/main/api/logout.php" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150 rounded-b-xl"><ion-icon class="mx-2 text-lg" name="power-outline"></ion-icon> Log out</a></li>
                 </ul>
             `;
             if (profileLink) profileLink.classList.remove('hidden');
@@ -198,7 +198,7 @@ async function fetchUserProfile() {
                 });
             }
         } else if (profileHeader) {
-            profileHeader.innerHTML = '<a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800 text-sm">Log in</a>';
+            profileHeader.innerHTML = '<a href="/main/login.html" class="text-gray-600 hover:text-gray-800 text-sm">Log in</a>';
             if (profileLink) profileLink.classList.add('hidden');
             if (notifyLink) notifyLink.classList.add('hidden');
             if (newPostLink) newPostLink.classList.add('hidden');
@@ -221,7 +221,7 @@ async function fetchUserProfile() {
         console.error('Error fetching user profile in script.js:', error);
         const profileHeader = document.getElementById('user-profile');
         if (profileHeader) {
-            profileHeader.innerHTML = '<a href="/sphere/login.html" class="text-gray-600 hover:text-gray-800 text-sm">Log in</a>';
+            profileHeader.innerHTML = '<a href="/main/login.html" class="text-gray-600 hover:text-gray-800 text-sm">Log in</a>';
             const profileLink = document.querySelector('.profile-link');
             const notifyLink = document.querySelector('.notify-link');
             const newPostLink = document.querySelector('.new_post-link');
@@ -271,15 +271,15 @@ function setupMenuClickHandlers() {
 
 function restrictUnauthorizedURLs() {
     const validPaths = [
-        '/sphere/index.html', '/sphere/profile.html', '/sphere/new_post.html',
-        '/sphere/settings.html', '/sphere/trending.html', '/sphere/explorer.html',
-        '/sphere/post.html', '/sphere/login.html', '/sphere/register.html',
-        '/sphere/edit_post.html', '/sphere/forgot_password.html'
+        '/main/index.html', '/main/profile.html', '/main/new_post.html',
+        '/main/settings.html', '/main/trending.html', '/main/explorer.html',
+        '/main/post.html', '/main/login.html', '/main/register.html',
+        '/main/edit_post.html', '/main/forgot_password.html'
     ];
     const currentPath = window.location.pathname;
     if (!validPaths.includes(currentPath)) {
-        console.log('Invalid path, redirecting to /sphere/index.html');
-        window.location.replace('/sphere/index.html');
+        console.log('Invalid path, redirecting to /main/index.html');
+        window.location.replace('/main/index.html');
     }
 }
 

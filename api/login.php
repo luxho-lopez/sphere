@@ -1,5 +1,5 @@
 <?php
-// /sphere/api/login.php
+// /main/api/login.php
 session_start();
 header('Content-Type: application/json');
 
