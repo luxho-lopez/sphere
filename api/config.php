@@ -3,7 +3,7 @@
 define('DB_HOST', 'localhost'); // Cambia según tu host de MySQL
 define('DB_USER', 'root'); // Cambia según tu usuario de MySQL
 define('DB_PASS', '');      // Cambia según tu contraseña de MySQL
-define('DB_NAME', 'sphere');
+define('DB_NAME', 'sys_nimbus_app'); // Cambia según tu nombre de base de datos
 
 function getDBConnection() {
     try {

@@ -4,7 +4,7 @@ const headerTemplate = `
         <div class="logo flex items-center space-x-2 flex-shrink-0">
             <a href="/main/index.html">
                 <h1 class="text-2xl font-bold text-gray-800 md:text-2xl text-lg">
-                    <span class="md:inline hidden">Sphere</span>
+                    <span class="md:inline hidden">Nimbus</span>
                     <span class="md:hidden inline">S</span>
                 </h1>
             </a>

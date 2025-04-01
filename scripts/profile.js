@@ -85,7 +85,7 @@ async function fetchProfileByUsername(username) {
                             </button>
                         </div>
                     </div>
-                    <p class="mt-6 text-gray-600 dark:text-gray-300">${user.description || 'Hi, I\'m a member of the Sphere community. Check out my posts below!'}</p>
+                    <p class="mt-6 text-gray-600 dark:text-gray-300">${user.description || 'Hi, I\'m a member of the Nimbus community. Check out my posts below!'}</p>
                     <div class="mt-6">
                         <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Contact</h2>
                         <a href="mailto:${user.email}" class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline">
