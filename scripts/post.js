@@ -107,7 +107,7 @@ async function createPostElement(post, index) {
         <div class="flex flex-col pt-4 border-t border-gray-100">
             <div class="flex justify-around mb-3">
                 <button class="reaction-btn flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors" data-post-id="${post.id}">
-                    <i class="fa-regular ${post.user_liked ? 'fa-heart' : 'fa-heart'}" 
+                    <i class="${post.user_liked ? 'fa-solid' : 'fa-regular'} fa-heart" 
                     style="color: ${post.user_liked ? 'oklch(0.623 0.214 259.815)' : 'inherit'}; font-size: 1.125rem;"></i>
                     <span class="like-count text-sm font-medium">${post.like_count}</span>
                 </button>

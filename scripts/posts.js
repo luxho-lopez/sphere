@@ -198,7 +198,7 @@ function showPostModal(post) {
                 <p class="text-gray-700 text-base leading-relaxed mb-6 whitespace-pre-wrap">${post.content}</p>
                 <div class="flex items-center space-x-4 border-t border-gray-100 pt-4">
                     <button class="reaction-btn flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors" data-post-id="${post.id}">
-                        <i class="fa-regular ${post.user_liked ? 'fa-heart' : 'fa-heart'}" style="color: ${post.user_liked ? 'oklch(0.623 0.214 259.815)' : 'inherit'}; font-size: 1.125rem;"></i>
+                        <i class="${post.user_liked ? 'fa-solid' : 'fa-regular'} fa-heart" style="color: ${post.user_liked ? 'oklch(0.623 0.214 259.815)' : 'inherit'}; font-size: 1.125rem;"></i>
                         <span class="like-count text-sm font-medium">${post.like_count}</span>
                     </button>
                 </div>
