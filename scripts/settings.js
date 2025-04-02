@@ -73,8 +73,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 isPasswordVisible = !isPasswordVisible;
                 currentPassword.type = isPasswordVisible ? 'text' : 'password';
                 togglePassword.innerHTML = isPasswordVisible ? 
-                    '<ion-icon name="eye-off-outline" class="text-xl"></ion-icon>' : 
-                    '<ion-icon name="eye-outline" class="text-xl"></ion-icon>';
+                    '<i class="fa-regular fa-eye text-xl"></i>' : 
+                    '<i class="fa-solid fa-eye-slash text-xl"></i>';
             };
 
             saveBtn.onclick = async () => {

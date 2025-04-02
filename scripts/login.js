@@ -44,7 +44,11 @@ document.addEventListener('DOMContentLoaded', () => {
         togglePassword.addEventListener('click', () => {
             const isPassword = passwordInput.type === 'password';
             passwordInput.type = isPassword ? 'text' : 'password';
-            togglePassword.name = isPassword ? 'eye-off-outline' : 'eye-outline';
+            // Remover ambas clases primero para evitar conflictos
+            togglePassword.classList.remove('fa-eye', 'fa-eye-slash');
+
+            // Agregar la clase correspondiente
+            togglePassword.classList.add(isPassword ? 'fa-eye' : 'fa-eye-slash');
         });
     }
 });

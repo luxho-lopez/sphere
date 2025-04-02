@@ -104,7 +104,7 @@ aside {
 }
 
 /* Asegurar que IonIcons se muestren correctamente */
-ion-icon {
+i {
     display: inline-flex !important;
     vertical-align: middle;
 }

@@ -84,7 +84,7 @@ async function createPostElement(post, index) {
                 </a>
             </div>
             <div class="relative z-10">
-                <ion-icon name="ellipsis-vertical-outline" class="text-gray-600 cursor-pointer hover:text-gray-800 transition-colors submenu-toggle"></ion-icon>
+                <i class="fa-solid fa-ellipsis-vertical text-gray-600 cursor-pointer hover:text-gray-800 transition-colors submenu-toggle"></i>
                 <div class="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg submenu hidden border border-gray-100">
                     ${postUserId === currentUserId && currentUserId !== 0 ? `
                         <button class="edit-post-btn block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">Edit Post</button>
@@ -107,11 +107,13 @@ async function createPostElement(post, index) {
         <div class="flex flex-col pt-4 border-t border-gray-100">
             <div class="flex justify-around mb-3">
                 <button class="reaction-btn flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors" data-post-id="${post.id}">
-                    <ion-icon name="${post.user_liked ? 'heart' : 'heart-outline'}" class="text-lg" style="color: ${post.user_liked ? 'oklch(0.623 0.214 259.815)' : 'inherit'};"></ion-icon>
+                    <i class="fa-regular ${post.user_liked ? 'fa-heart' : 'fa-heart'}" 
+                    style="color: ${post.user_liked ? 'oklch(0.623 0.214 259.815)' : 'inherit'}; font-size: 1.125rem;"></i>
                     <span class="like-count text-sm font-medium">${post.like_count}</span>
                 </button>
+                
                 <button class="comment-btn flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors">
-                    <ion-icon name="chatbubbles-outline" class="text-lg" style="color: ${commentsList.length >= 1 ? 'oklch(0.623 0.214 259.815)' : 'inherit'};"></ion-icon>
+                    <i class="fa-regular fa-comments text-lg" style="color: ${commentsList.length >= 1 ? 'oklch(0.623 0.214 259.815)' : 'inherit'};"></i>
                     <span class="comment-count text-sm font-medium">${commentsList.length}</span>
                 </button>
             </div>
@@ -209,9 +211,9 @@ async function handleLike(post, element) {
             post.like_count += post.user_liked ? 1 : -1;
             const btn = element.querySelector('.reaction-btn');
             if (btn) {
-                const icon = btn.querySelector('ion-icon');
+                const icon = btn.querySelector('i');
                 if (icon) {
-                    icon.name = post.user_liked ? 'heart' : 'heart-outline';
+                    icon.classList = post.user_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
                     icon.style.color = post.user_liked ? 'oklch(0.623 0.214 259.815)' : 'gray';
                 }
                 const count = btn.querySelector('.like-count');
@@ -221,9 +223,9 @@ async function handleLike(post, element) {
             if (postElement) {
                 const mainBtn = postElement.querySelector('.reaction-btn');
                 if (mainBtn) {
-                    const mainIcon = mainBtn.querySelector('ion-icon');
+                    const mainIcon = mainBtn.querySelector('i');
                     if (mainIcon) {
-                        mainIcon.name = post.user_liked ? 'heart' : 'heart-outline';
+                        mainIcon.classList = post.user_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
                         mainIcon.style.color = post.user_liked ? 'oklch(0.623 0.214 259.815)' : 'gray';
                     }
                     const mainCount = mainBtn.querySelector('.like-count');
@@ -274,7 +276,7 @@ async function handleComment(postId, postElement) {
             if (commentCount) {
                 const currentCount = parseInt(commentCount.textContent) || 0;
                 commentCount.textContent = currentCount + 1;
-                const commentIcon = postElement.querySelector('.comment-btn ion-icon');
+                const commentIcon = postElement.querySelector('.comment-btn i');
                 if (commentIcon) commentIcon.style.color = (currentCount + 1) >= 1 ? 'oklch(0.623 0.214 259.815)' : 'gray';
             }
 
@@ -353,7 +355,7 @@ async function deleteComment(commentId, postElement, postId) {
             if (commentCount) {
                 const currentCount = parseInt(commentCount.textContent) || 0;
                 commentCount.textContent = currentCount - 1;
-                const commentIcon = postElement.querySelector('.comment-btn ion-icon');
+                const commentIcon = postElement.querySelector('.comment-btn i');
                 if (commentIcon) commentIcon.style.color = (currentCount - 1) >= 1 ? 'oklch(0.623 0.214 259.815)' : 'gray';
             }
 

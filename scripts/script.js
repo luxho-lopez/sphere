@@ -43,13 +43,13 @@ async function fetchNotifications() {
                         <a href="${redirectUrl}" class="flex justify-between items-center">
                             <div>
                                 <span>${notif.message}</span>
-                                <span class="text-xs text-gray-500 block">${new Date(notif.timestamp).toLocaleString()}</span>
+                                <span class="text-xs text-gray-500 block">${new Date(notif.created_at).toLocaleString()}</span>
                             </div>
                         </a>
                         <button class="toggle-read-btn text-xs ${
                             notif.is_read ? 'text-blue-500' : 'text-gray-500'
                         }" title="${notif.is_read ? 'Mark as unread' : 'Mark as read'}">
-                            <ion-icon name="${notif.is_read ? 'eye-off-outline' : 'eye-outline'}" class="ml-2" size="small"></ion-icon>
+                            <i class="fa-regular ${notif.is_read ? 'fa-eye' : 'fa-eye-slash'} ml-2" size="small"></i>
                         </button>
                     </div>
                 `;
@@ -74,7 +74,7 @@ async function fetchNotifications() {
                     const newState = !currentState;
                 
                     this.disabled = true;
-                    this.innerHTML = '<ion-icon name="refresh-outline" class="animate-spin"></ion-icon>';
+                    this.innerHTML = '<i class="fa-solid fa-arrow-rotate-right animate-spin"></i>';
                 
                     const success = await toggleNotificationRead(notificationId, newState);
                     
@@ -83,8 +83,8 @@ async function fetchNotifications() {
                         notificationDiv.classList.toggle('bg-gray-50', !newState);
                         this.classList.toggle('text-blue-500', newState);
                         this.classList.toggle('text-gray-500', !newState);
-                        this.querySelector('ion-icon').setAttribute('name', 
-                            newState ? 'eye-off-outline' : 'eye-outline');
+                        this.querySelector('i').setAttribute('class', 
+                            newState ? 'fa-eye' : 'fa-eye-slash');
                         this.setAttribute('title', 
                             newState ? 'Mark as unread' : 'Mark as read');
                         // Update unread count after toggling
@@ -96,7 +96,7 @@ async function fetchNotifications() {
                     }
                     
                     this.disabled = false;
-                    this.innerHTML = `<ion-icon name="${newState ? 'eye-off-outline' : 'eye-outline'}" class="ml-2" size="small"></ion-icon>`;
+                    this.innerHTML = `<i class="fa-regular ${newState ? 'fa-eye' : 'fa-eye-slash'} ml-2" size="small"></i>`;
                 });
             });
         } else {
@@ -165,7 +165,7 @@ async function fetchUserProfile() {
             if (!logoLink.querySelector('.menu-toggle')) {
                 logoLink.insertAdjacentHTML('afterend', `
                     <button class="menu-toggle md:hidden text-gray-600 hover:text-gray-800 focus:outline-none flex items-end">
-                        <ion-icon name="menu-outline" class="text-2xl"></ion-icon>
+                        <i class="fa-solid fa-bars text-2xl"></i>
                     </button>
                 `);
                 setupMenuToggle();
@@ -178,9 +178,22 @@ async function fetchUserProfile() {
                     <img src="${user.profile_picture || '/main/images/profile/default-avatar.png'}" alt="${user.first_name}" class="w-8 h-8 rounded-full object-cover">
                 </a>
                 <ul class="sub-menu absolute right-0 mt-3 w-60 bg-white shadow-lg rounded-xl border border-gray-100 z-50 hidden transition-all duration-200 ease-in-out">
-                    <li><a href="/main/profile.html?user=@${user.username}" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150"><ion-icon class="mx-2 text-lg" name="person-circle-outline"></ion-icon> ${user.first_name}</a></li>
-                    <li><a href="/main/settings.html" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150"><ion-icon class="mx-2 text-lg" name="cog-outline"></ion-icon> Settings</a></li>
-                    <li><a href="/main/api/logout.php" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150 rounded-b-xl"><ion-icon class="mx-2 text-lg" name="power-outline"></ion-icon> Log out</a></li>
+                    <li>
+                        <a href="/main/profile.html?user=@${user.username}" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150">
+                            <i class="fa-regular fa-user mx-2 text-lg"></i>
+                            ${user.first_name}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/main/settings.html" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150">
+                            <i class="fa-solid fa-gear mx-2 text-lg"></i> Settings
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/main/api/logout.php" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150 rounded-b-xl">
+                            <i class="fa-solid fa-power-off mx-2 text-lg"></i> Log out
+                        </a>
+                    </li>
                 </ul>
             `;
             if (profileLink) profileLink.classList.remove('hidden');

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nimbus - Register</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100">
     <main class="flex-1 p-6 flex items-center justify-center">
@@ -21,19 +22,17 @@
                 <input type="text" name="last_name" placeholder="Last Name" class="w-full p-2 border rounded text-sm" required>
                 <div class="password-container" style="position: relative;">
                     <input type="password" id="password" name="password" placeholder="Password" class="w-full p-2 border rounded text-sm" required>
-                    <ion-icon name="eye-outline" id="toggle-password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></ion-icon>
+                    <i class="fa-regular fa-eye-slash" id="toggle-password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
                 </div>
                 <div class="password-container" style="position: relative;">
                     <input type="password" id="password_confirm" name="password_confirm" placeholder="Password Confirmation" class="w-full p-2 border rounded text-sm" required>
-                    <ion-icon name="eye-outline" id="toggle_confirm" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></ion-icon>
+                    <i class="fa-regular fa-eye-slash" id="toggle_confirm" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
                 </div>
                 <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Register</button>
                 <p class="text-center text-gray-600 text-sm">Already have an account? <a href="login.html" class="text-blue-500 hover:underline">Login</a></p>
             </form>
         </section>
     </main>
-    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script src="/main/scripts/register.js" defer></script>
 </body>
 </html>

@@ -12,7 +12,7 @@ const headerTemplate = `
         <div class="search-div w-full max-w-md mx-4 relative flex-grow">
             <div class="relative">
                 <input id="search-input" class="w-full bg-gray-50 text-gray-800 text-sm border border-gray-200 rounded-full pl-10 pr-4 py-2.5 transition duration-300 ease focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 shadow-sm hover:shadow-md placeholder-gray-400" placeholder="Search users or posts..." autocomplete="off" />
-                <ion-icon name="search-outline" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg"></ion-icon>
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg"></i>
                 <div id="search-results" class="absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-xl max-h-96 overflow-y-auto hidden z-50 border border-gray-100"></div>
             </div>
         </div>
@@ -23,13 +23,13 @@ const headerTemplate = `
                 <li class="new_post-link">
                     <a href="/main/new_post.html" class="text-gray-600 hover:text-gray-800">
                         <span class="inline-flex shrink-0 rounded-full border border-blue-300 bg-blue-100 p-2 dark:border-blue-300/10 dark:bg-blue-400/10">
-                            <ion-icon name="add-outline"></ion-icon>
+                            <i class="fa-solid fa-plus"></i>
                         </span>
                     </a>
                 </li>
                 <li class="notify-link relative hidden">
                     <div id="user-notify" class="text-gray-600 hover:text-gray-800 cursor-pointer relative">
-                        <ion-icon name="notifications-outline" class="text-2xl"></ion-icon>
+                        <i class="fa-regular fa-bell text-2xl"></i>
                         <span id="unread-count" class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center animate-pulse hidden">0</span>
                     </div>
                     <ul class="notify-sub-menu absolute right-0 mt-3 w-72 bg-white shadow-lg rounded-xl border border-gray-100 z-50 hidden transition-all duration-200 ease-in-out">
@@ -57,19 +57,19 @@ const asideTemplate = `
             <ul id="sidebar-menu" class="space-y-3 mt-20">
                 <li>
                     <a href="/main/index.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200">
-                        <ion-icon name="home-outline" class="mr-4 text-xl text-gray-500"></ion-icon>
+                        <i class="fa-solid fa-house mr-4 text-xl text-gray-500"></i>
                         <span class="text-sm font-medium">Home</span>
                     </a>
                 </li>
                 <li>
                     <a href="/main/trending.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200">
-                        <ion-icon name="trending-up-outline" class="mr-4 text-xl text-gray-500"></ion-icon>
+                        <i class="fa-solid fa-arrow-trend-up mr-4 text-xl text-gray-500"></i>
                         <span class="text-sm font-medium">Trending</span>
                     </a>
                 </li>
                 <li>
                     <a href="/main/explorer.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200">
-                        <ion-icon name="planet-outline" class="mr-4 text-xl text-gray-500"></ion-icon>
+                        <i class="fa-solid fa-globe mr-4 text-xl text-gray-500"></i>
                         <span class="text-sm font-medium">Explorer</span>
                     </a>
                 </li>
