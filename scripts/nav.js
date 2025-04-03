@@ -1,11 +1,10 @@
-// Definir el HTML del header y aside como templates
+// Definir el HTML del header, aside, section y el nuevo menú flotante como templates
 const headerTemplate = `
     <header class="fixed top-0 left-0 w-full bg-white shadow-md p-4 flex justify-between items-center transition-transform duration-300 z-50">
         <div class="logo flex items-center space-x-2 flex-shrink-0">
             <a href="/main/index.html">
                 <h1 class="text-2xl font-bold text-gray-800 md:text-2xl text-lg">
                     <span class="md:inline hidden">Nimbus</span>
-                    <span class="md:hidden inline">S</span>
                 </h1>
             </a>
         </div>
@@ -16,7 +15,7 @@ const headerTemplate = `
                 <div id="search-results" class="absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-xl max-h-96 overflow-y-auto hidden z-50 border border-gray-100"></div>
             </div>
         </div>
-        <nav class="flex-shrink-0">
+        <nav class="flex-shrink-0 hidden md:block"> <!-- Ocultar en pantallas pequeñas -->
             <ul id="nav-menu" class="flex items-center space-x-4 sm:space-x-6">
                 <li class="login-link"><a href="/main/login.html" class="text-gray-600 hover:text-gray-800">Log In</a></li>
                 <li class="register-link"><a href="/main/register.html" class="text-gray-600 hover:text-gray-800">Register</a></li>
@@ -48,6 +47,11 @@ const headerTemplate = `
                 </li>
             </ul>
         </nav>
+        <div class="flex items-center space-x-2 flex-shrink-0 md:hidden">
+            <a href="/main/settings.html" class="text-gray-600 text-lg font-semibold hover:text-gray-800 cursor-pointer relative">
+                <i class="fa-solid fa-gear"></i>
+            </a>
+        </div>
     </header>
 `;
 
@@ -78,10 +82,53 @@ const asideTemplate = `
     </aside>
 `;
 
-// Función para inyectar el header y aside
+const sectionTemplate = `
+    <div id="floating-section" class="fixed bottom-4 right-4 w-64 max-h-80 bg-white shadow-lg rounded-xl border border-gray-100 p-4 hidden md:block z-50 overflow-y-auto transition-all duration-300 ease-in-out">
+        <nav>
+            <ul id="section-menu" class="space-y-2">
+                <li>
+                    <a href="/main/index.html" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200">
+                        <i class="fa-solid fa-circle-info mr-3 text-lg text-gray-500"></i>    
+                        <span class="text-sm font-medium">Information</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+`;
+
+const mobileMenuTemplate = `
+    <nav id="mobile-menu" class="fixed bottom-0 left-0 w-full bg-white shadow-lg border-t border-gray-100 p-2 flex justify-around items-center md:hidden z-50">
+        <a href="/main/index.html" class="flex flex-col items-center text-gray-600 hover:text-blue-600 p-2">
+            <i class="fa-solid fa-house text-xl"></i>
+            <span class="text-xs">Home</span>
+        </a>
+        <a href="/main/messages.html" class="flex flex-col items-center text-gray-600 hover:text-blue-600 p-2">
+            <i class="fa-solid fa-envelope text-xl"></i>
+            <span class="text-xs">Messages</span>
+        </a>
+        <a href="/main/new_post.html" class="flex flex-col items-center text-gray-600 hover:text-blue-600 p-2">
+            <i class="fa-solid fa-plus text-xl"></i>
+            <span class="text-xs">New Post</span>
+        </a>
+        <a href="/main/notify.html" class="flex flex-col items-center text-gray-600 hover:text-blue-600 p-2 relative">
+            <i class="fa-regular fa-bell text-xl"></i>
+            <span class="text-xs">Notifications</span>
+            <span id="mobile-unread-count" class="absolute top-0 right-0 bg-blue-500 text-white text-xs font-medium rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+        </a>
+        <a href="/main/profile.html" class="flex flex-col items-center text-gray-600 hover:text-blue-600 p-2">
+            <i class="fa-solid fa-user text-xl"></i>
+            <span class="text-xs">Profile</span>
+        </a>
+    </nav>
+`;
+
+// Función para inyectar el header, aside, section y menú flotante
 function injectNavigation() {
     const headerElement = document.querySelector('header');
     const asideElement = document.querySelector('aside');
+    const sectionElement = document.querySelector('#floating-section');
+    const mobileMenuElement = document.querySelector('#mobile-menu');
 
     if (headerElement) {
         headerElement.outerHTML = headerTemplate;
@@ -93,6 +140,18 @@ function injectNavigation() {
         asideElement.outerHTML = asideTemplate;
     } else {
         document.body.insertAdjacentHTML('afterbegin', asideTemplate);
+    }
+
+    if (sectionElement) {
+        sectionElement.outerHTML = sectionTemplate;
+    } else {
+        document.body.insertAdjacentHTML('beforeend', sectionTemplate);
+    }
+
+    if (mobileMenuElement) {
+        mobileMenuElement.outerHTML = mobileMenuTemplate;
+    } else {
+        document.body.insertAdjacentHTML('beforeend', mobileMenuTemplate); // Inyectar al final del body
     }
 
     setupSearch(); // Initialize search functionality after injecting the header

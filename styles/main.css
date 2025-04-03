@@ -88,6 +88,17 @@ aside {
     animation: pulse 1.5s infinite ease-in-out;
 }
 
+@media (max-width: 1250px) {
+    .main {
+        margin-left: 16rem;
+        padding-right: 16rem;
+    }
+
+    #floating-section {
+        display: none;
+    }
+}
+
 /* Solo aplicar transform en pantallas pequeñas */
 @media (max-width: 767px) {
     aside {
@@ -100,6 +111,11 @@ aside {
 
     aside:not(.hidden) {
         transform: translateX(0);
+    }
+
+    .main {
+        margin-left: 0;
+        margin-bottom: 4rem;
     }
 }
 

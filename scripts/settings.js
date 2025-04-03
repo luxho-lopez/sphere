@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('first_name').textContent = data.data.first_name;
         document.getElementById('last_name').textContent = data.data.last_name;
         document.getElementById('profile_picture').src = data.data.profile_picture || '/main/images/profile/default-avatar.png';
-        document.getElementById('cover_photo').src = data.data.cover_photo || '/main/images/covers/default-cover-photo.png'; // Add default cover image
+        document.getElementById('cover_photo').src = data.data.cover_photo || '/main/images/covers/default-cover-photo.png';
         document.getElementById('description').textContent = data.data.description || 'No description set';
     } catch (error) {
         console.error('Error fetching settings:', error);
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                         modal.classList.add('hidden');
                     } else {
-                        alert('Error: ' + (data.message || 'Unknown error'));
+                        alert('Error: ' + (data.message || 'Unknown error')); // Mostrar mensaje específico del servidor
                     }
                 } catch (error) {
                     console.error('Error updating setting:', error);

@@ -40,6 +40,16 @@ try {
         }
     }
 
+    // Check if email or phone is already registered by another user
+    if ($field === 'email' || $field === 'phone' || $field === 'username') {
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE $field = ? AND id != ?");
+        $stmt->execute([$value, $_SESSION['user_id']]);
+        if ($stmt->fetch(PDO::FETCH_ASSOC)) {
+            echo json_encode(['success' => false, 'message' => 'This ' . $field . ' is already registered']);
+            exit;
+        }
+    }
+
     // Handle file uploads for profile_picture and cover_photo
     if (($field === 'profile_picture' || $field === 'cover_photo') && isset($_FILES['value'])) {
         $uploadDir = $field === 'profile_picture' 
