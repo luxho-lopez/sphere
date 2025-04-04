@@ -1,4 +1,5 @@
-document.addEventListener('DOMContentLoaded', async () => {
+// script.js
+document.addEventListener('navigationReady', async () => {
     try {
         const user = await fetchUserProfile();
         if (user) {
@@ -9,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         restrictUnauthorizedURLs();
         setupHeaderScroll();
     } catch (error) {
-        console.error('Error during DOM load:', error);
+        console.error('Error during navigation ready:', error);
     }
 });
 
@@ -31,7 +32,6 @@ async function fetchNotifications() {
         if (data.success && data.notifications?.length) {
             const unreadCount = data.notifications.filter(notif => !notif.is_read).length;
             notificationsList.innerHTML = data.notifications.map(notif => {
-                // Determinar la URL de redirección basada en el tipo de notificación
                 const redirectUrl = notif.type === 'follow' 
                     ? `/main/profile.html?user=@${notif.reference}` 
                     : `/main/post.html?post_id=${notif.reference || ''}`;
@@ -55,7 +55,6 @@ async function fetchNotifications() {
                 `;
             }).join('');
 
-            // Update unread count badge
             if (unreadCount > 0) {
                 unreadCountBadge.textContent = unreadCount;
                 unreadCountBadge.classList.remove('hidden');
@@ -63,7 +62,6 @@ async function fetchNotifications() {
                 unreadCountBadge.classList.add('hidden');
             }
             
-            // Add event listeners for toggle buttons
             notificationsList.querySelectorAll('.toggle-read-btn').forEach(btn => {
                 btn.addEventListener('click', async function(e) {
                     e.stopPropagation();
@@ -87,7 +85,6 @@ async function fetchNotifications() {
                             newState ? 'fa-eye' : 'fa-eye-slash');
                         this.setAttribute('title', 
                             newState ? 'Mark as unread' : 'Mark as read');
-                        // Update unread count after toggling
                         const updatedResponse = await fetch('/main/api/get_notifications.php', { credentials: 'include' });
                         const updatedData = await updatedResponse.json();
                         const newUnreadCount = updatedData.notifications.filter(n => !n.is_read).length;
@@ -152,7 +149,6 @@ async function fetchUserProfile() {
         const newPostLink = document.querySelector('.new_post-link');
         const loginLink = document.querySelector('.login-link');
         const registerLink = document.querySelector('.register-link');
-        const logoutLink = document.querySelector('.logout-link');
         const logoContainer = document.querySelector('.logo');
 
         if (!response.ok) throw new Error('Unauthorized');
@@ -162,7 +158,7 @@ async function fetchUserProfile() {
 
         if (logoContainer) {
             const logoLink = logoContainer.querySelector('a');
-            if (!logoLink.querySelector('.menu-toggle')) {
+            if (!logoLink.nextElementSibling?.classList.contains('menu-toggle')) {
                 logoLink.insertAdjacentHTML('afterend', `
                     <button class="menu-toggle md:hidden text-gray-600 hover:text-gray-800 focus:outline-none flex items-end">
                         <i class="fa-solid fa-bars text-2xl"></i>
@@ -201,7 +197,6 @@ async function fetchUserProfile() {
             if (newPostLink) newPostLink.classList.remove('hidden');
             if (loginLink) loginLink.classList.add('hidden');
             if (registerLink) registerLink.classList.add('hidden');
-            if (logoutLink) logoutLink.classList.add('hidden');
 
             const notifySubMenu = notifyLink.querySelector('.notify-sub-menu');
             if (notifyHeader && notifySubMenu) {
@@ -217,7 +212,6 @@ async function fetchUserProfile() {
             if (newPostLink) newPostLink.classList.add('hidden');
             if (loginLink) loginLink.classList.remove('hidden');
             if (registerLink) registerLink.classList.remove('hidden');
-            if (logoutLink) logoutLink.classList.add('hidden');
         }
 
         const profileLinkElement = profileHeader.querySelector('.user-profile-link');
@@ -240,13 +234,11 @@ async function fetchUserProfile() {
             const newPostLink = document.querySelector('.new_post-link');
             const loginLink = document.querySelector('.login-link');
             const registerLink = document.querySelector('.register-link');
-            const logoutLink = document.querySelector('.logout-link');
             if (profileLink) profileLink.classList.add('hidden');
             if (notifyLink) notifyLink.classList.add('hidden');
             if (newPostLink) newPostLink.classList.add('hidden');
             if (loginLink) loginLink.classList.remove('hidden');
             if (registerLink) registerLink.classList.remove('hidden');
-            if (logoutLink) logoutLink.classList.add('hidden');
         }
         return null;
     }

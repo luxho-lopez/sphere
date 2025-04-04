@@ -1,3 +1,4 @@
+// nav.js
 // Definir el HTML del header, aside, section y el nuevo menú flotante como templates
 const headerTemplate = `
     <header class="fixed top-0 left-0 w-full bg-white shadow-md p-4 flex justify-between items-center transition-transform duration-300 z-50">
@@ -15,11 +16,11 @@ const headerTemplate = `
                 <div id="search-results" class="absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-xl max-h-96 overflow-y-auto hidden z-50 border border-gray-100"></div>
             </div>
         </div>
-        <nav class="flex-shrink-0 hidden md:block"> <!-- Ocultar en pantallas pequeñas -->
+        <nav class="flex-shrink-0 hidden md:block">
             <ul id="nav-menu" class="flex items-center space-x-4 sm:space-x-6">
                 <li class="login-link"><a href="/main/login.html" class="text-gray-600 hover:text-gray-800">Log In</a></li>
                 <li class="register-link"><a href="/main/register.html" class="text-gray-600 hover:text-gray-800">Register</a></li>
-                <li class="new_post-link">
+                <li class="new_post-link hidden">
                     <a href="/main/new_post.html" class="text-gray-600 hover:text-gray-800">
                         <span class="inline-flex shrink-0 rounded-full border border-blue-300 bg-blue-100 p-2 dark:border-blue-300/10 dark:bg-blue-400/10">
                             <i class="fa-solid fa-plus"></i>
@@ -39,7 +40,7 @@ const headerTemplate = `
                         </li>
                     </ul>
                 </li>
-                <li class="profile-link relative block min-w-[32px]">
+                <li class="profile-link relative block min-w-[32px] hidden">
                     <div id="user-profile" class="text-gray-600 hover:text-gray-800 cursor-pointer"></div>
                     <ul class="sub-menu absolute right-0 mt-3 w-60 bg-white shadow-lg rounded-xl border border-gray-100 z-50 hidden transition-all duration-200 ease-in-out">
                         <!-- Dynamic content populated by script.js -->
@@ -83,17 +84,46 @@ const asideTemplate = `
 `;
 
 const sectionTemplate = `
-    <div id="floating-section" class="fixed bottom-4 right-4 w-64 max-h-80 bg-white shadow-lg rounded-xl border border-gray-100 p-4 hidden md:block z-50 overflow-y-auto transition-all duration-300 ease-in-out">
+    <div id="floating-section" class="fixed bottom-4 right-4 w-64 max-h-96 bg-white shadow-lg rounded-xl border border-gray-100 p-4 hidden md:block z-50 overflow-y-auto transition-all duration-300 ease-in-out">
         <nav>
-            <ul id="section-menu" class="space-y-2">
-                <li>
-                    <a href="/main/index.html" class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200">
-                        <i class="fa-solid fa-circle-info mr-3 text-lg text-gray-500"></i>    
-                        <span class="text-sm font-medium">Information</span>
-                    </a>
+            <ul id="section-friends" class="space-y-2">
+                <li class="flex items-center px-3 py-2">
+                    <i class="fa-solid fa-users mr-3 text-lg text-gray-500"></i>    
+                    <span class="text-sm font-medium">Friends</span>
                 </li>
+                <!-- Los amigos se cargarán dinámicamente aquí -->
+            </ul>
+            <hr class="my-2">
+            <ul id="section-chats" class="space-y-2">
+                <li class="flex items-center px-3 py-2">
+                    <i class="fa-regular fa-comments mr-3 text-lg text-gray-500"></i> 
+                    <span class="text-sm font-medium">Chats</span>
+                </li>
+                <!-- Los chats se cargarán dinámicamente aquí -->
             </ul>
         </nav>
+    </div>
+`;
+
+const chatWindowTemplate = `
+    <div id="chat-window" class="fixed bottom-4 right-72 w-80 max-h-96 bg-white shadow-lg rounded-xl border border-gray-100 hidden z-50 overflow-hidden transition-all duration-300 ease-in-out">
+        <div class="flex justify-between items-center p-3 bg-gray-100 border-b">
+            <h3 id="chat-title" class="text-sm font-semibold text-gray-700"></h3>
+            <div class="flex space-x-2">
+                <button id="minimize-chat" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button id="close-chat" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div id="chat-messages-container" class="p-3 max-h-64 overflow-y-auto relative">
+            <div id="chat-messages"></div>
+        </div>
+        <form id="chat-form" class="p-3 border-t">
+            <input id="chat-input" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Type a message..." />
+        </form>
     </div>
 `;
 
@@ -123,46 +153,65 @@ const mobileMenuTemplate = `
     </nav>
 `;
 
-// Función para inyectar el header, aside, section y menú flotante
-function injectNavigation() {
-    const headerElement = document.querySelector('header');
-    const asideElement = document.querySelector('aside');
-    const sectionElement = document.querySelector('#floating-section');
-    const mobileMenuElement = document.querySelector('#mobile-menu');
+// Template para notificaciones flotantes
+const notificationTemplate = (messageId, senderName, content, friendId) => `
+    <div class="notification fixed bottom-16 right-4 bg-white shadow-lg rounded-lg border border-gray-100 p-4 w-80 z-50 flex items-start space-x-3 cursor-pointer" data-message-id="${messageId}" data-friend-id="${friendId}">
+        <i class="fa-solid fa-envelope text-blue-500 text-xl"></i>
+        <div class="flex-1">
+            <p class="text-sm font-medium text-gray-800">${senderName}</p>
+            <p class="text-xs text-gray-600 truncate">${content}</p>
+        </div>
+        <button class="close-notification text-gray-500 hover:text-gray-700">
+            <i class="fa-solid fa-times"></i>
+        </button>
+    </div>
+`;
 
-    if (headerElement) {
-        headerElement.outerHTML = headerTemplate;
-    } else {
-        document.body.insertAdjacentHTML('afterbegin', headerTemplate);
+async function fetchSessionUserId() {
+    try {
+        const response = await fetch('/main/api/user.php', { credentials: 'include' });
+        const data = await response.json();
+        if (data.success) {
+            window.sessionUserId = data.user_id;
+        }
+    } catch (error) {
+        console.error('Error fetching session user ID:', error);
     }
-
-    if (asideElement) {
-        asideElement.outerHTML = asideTemplate;
-    } else {
-        document.body.insertAdjacentHTML('afterbegin', asideTemplate);
-    }
-
-    if (sectionElement) {
-        sectionElement.outerHTML = sectionTemplate;
-    } else {
-        document.body.insertAdjacentHTML('beforeend', sectionTemplate);
-    }
-
-    if (mobileMenuElement) {
-        mobileMenuElement.outerHTML = mobileMenuTemplate;
-    } else {
-        document.body.insertAdjacentHTML('beforeend', mobileMenuTemplate); // Inyectar al final del body
-    }
-
-    setupSearch(); // Initialize search functionality after injecting the header
 }
 
-// Ejecutar al cargar la página
+function injectNavigation() {
+    return fetchSessionUserId().then(() => {
+        const headerElement = document.querySelector('header');
+        const asideElement = document.querySelector('aside');
+        const sectionElement = document.querySelector('#floating-section');
+        const mobileMenuElement = document.querySelector('#mobile-menu');
+        const chatWindowElement = document.querySelector('#chat-window');
+
+        if (headerElement) headerElement.outerHTML = headerTemplate;
+        else document.body.insertAdjacentHTML('afterbegin', headerTemplate);
+
+        if (asideElement) asideElement.outerHTML = asideTemplate;
+        else document.body.insertAdjacentHTML('afterbegin', asideTemplate);
+
+        if (sectionElement) sectionElement.outerHTML = sectionTemplate;
+        else document.body.insertAdjacentHTML('beforeend', sectionTemplate);
+
+        if (mobileMenuElement) mobileMenuElement.outerHTML = mobileMenuTemplate;
+        else document.body.insertAdjacentHTML('beforeend', mobileMenuTemplate);
+
+        if (!chatWindowElement) document.body.insertAdjacentHTML('beforeend', chatWindowTemplate);
+
+        setupSearch();
+        setupFriendsAndChat();
+
+        document.dispatchEvent(new Event('navigationReady'));
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     injectNavigation();
 });
 
-// Real-time search functionality
 function setupSearch() {
     const searchInput = document.getElementById('search-input');
     const searchResults = document.getElementById('search-results');
@@ -230,7 +279,386 @@ function setupSearch() {
     });
 }
 
-// Debounce function to limit the rate of search requests
+function setupFriendsAndChat() {
+    const sectionFriends = document.getElementById('section-friends');
+    const sectionChats = document.getElementById('section-chats');
+    const chatWindow = document.getElementById('chat-window');
+    const chatTitle = document.getElementById('chat-title');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatMessagesContainer = document.getElementById('chat-messages-container');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const minimizeChat = document.getElementById('minimize-chat');
+    const closeChat = document.getElementById('close-chat');
+    let currentFriendId = null;
+    let lastMessageId = 0;
+    let pollingInterval = null;
+    let lastCheckedMessageId = 0;
+
+    // Cargar amigos dinámicamente (solo con seguimiento mutuo)
+    async function loadFriends() {
+        try {
+            const response = await fetch('/main/api/get_mutual_friends.php', { credentials: 'include' });
+            const data = await response.json();
+            if (data.success) {
+                sectionFriends.innerHTML = `
+                    <li class="flex items-center px-3 py-2">
+                        <i class="fa-solid fa-users mr-3 text-lg text-gray-500"></i>    
+                        <span class="text-sm font-medium">Friends</span>
+                    </li>
+                    ${data.friends.length ? data.friends.map(friend => `
+                        <li>
+                            <button class="friend-btn flex items-center px-3 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200 w-full" data-friend-id="${friend.id}">
+                                <img src="${friend.profile_picture || '/main/images/profile/default-avatar.png'}" class="w-8 h-8 rounded-full object-cover mr-2">
+                                <div class="text-left">
+                                    <span class="font-sm">${friend.first_name} ${friend.last_name || ''}</span>
+                                    <span class="block text-xs text-gray-500">@${friend.username}</span>
+                                </div>
+                            </button>
+                        </li>
+                    `).join('') : '<li class="px-3 py-2 text-sm text-gray-500">No mutual friends found</li>'}
+                `;
+                setupFriendButtons();
+            } else {
+                sectionFriends.innerHTML += '<li class="px-3 py-2 text-sm text-gray-500">No mutual friends found</li>';
+            }
+        } catch (error) {
+            console.error('Error loading friends:', error);
+            sectionFriends.innerHTML += '<li class="px-3 py-2 text-sm text-gray-500">Error loading friends</li>';
+        }
+    }
+
+    // Cargar chats dinámicamente
+    async function loadChats() {
+        try {
+            const response = await fetch('/main/api/get_chats.php', { credentials: 'include' });
+            const data = await response.json();
+            if (data.success && data.chats.length) {
+                sectionChats.innerHTML = `
+                    <li class="flex items-center px-3 py-2">
+                        <i class="fa-regular fa-comments mr-3 text-lg text-gray-500"></i> 
+                        <span class="text-sm font-medium">Chats</span>
+                    </li>
+                    ${data.chats.map(chat => `
+                        <li>
+                            <button class="chat-btn flex items-center px-3 py-2 text-blue-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors duration-200 w-full ${chat.sender_id !== window.sessionUserId && !chat.is_read ? 'bg-gray-100 font-semibold' : ''}" data-friend-id="${chat.friend_id}">
+                                <img src="${chat.profile_picture || '/main/images/profile/default-avatar.png'}" class="w-8 h-8 rounded-full object-cover mr-2">
+                                <div class="flex-1 text-left">
+                                    <span class="font-sm">${chat.username}</span>
+                                    <span class="block text-xs text-gray-500 truncate">${chat.last_message}</span>
+                                </div>
+                                <i class="fa-solid ${chat.is_read ? 'fa-eye-slash' : 'fa-eye'} text-gray-500 ml-2 cursor-pointer mark-read" data-message-id="${chat.message_id}" data-is-read="${chat.is_read ? 'true' : 'false'}"></i>
+                            </button>
+                        </li>
+                    `).join('')}
+                `;
+                setupChatButtons();
+            } else {
+                sectionChats.innerHTML = `
+                    <li class="flex items-center px-3 py-2">
+                        <i class="fa-regular fa-comments mr-3 text-lg text-gray-500"></i> 
+                        <span class="text-sm font-medium">Chats</span>
+                    </li>
+                `;
+            }
+        } catch (error) {
+            console.error('Error loading chats:', error);
+            sectionChats.innerHTML += '<li class="px-3 py-2 text-sm text-gray-500">Error loading chats</li>';
+        }
+    }
+
+    // Configurar botones de amigos
+    function setupFriendButtons() {
+        document.querySelectorAll('.friend-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentFriendId = btn.dataset.friendId;
+                chatTitle.textContent = btn.querySelector('span').textContent;
+                chatWindow.classList.remove('hidden');
+                loadChatHistory(currentFriendId);
+                markChatAsRead(currentFriendId);
+                startPolling(currentFriendId);
+            });
+        });
+    }
+
+    // Configurar botones de chats
+    function setupChatButtons() {
+        document.querySelectorAll('.chat-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentFriendId = btn.dataset.friendId;
+                chatTitle.textContent = btn.querySelector('span').textContent;
+                chatWindow.classList.remove('hidden');
+                loadChatHistory(currentFriendId);
+                markChatAsRead(currentFriendId);
+                startPolling(currentFriendId);
+            });
+        });
+
+        document.querySelectorAll('.mark-read').forEach(icon => {
+            icon.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const messageId = icon.dataset.messageId;
+                const currentIsRead = icon.dataset.isRead === 'true';
+                const newIsRead = !currentIsRead;
+
+                icon.classList.remove('fa-eye', 'fa-eye-slash');
+                icon.classList.add('fa-spinner', 'fa-spin');
+
+                const success = await toggleMessageReadStatus(messageId, newIsRead);
+
+                if (success) {
+                    icon.classList.remove('fa-spinner', 'fa-spin');
+                    icon.classList.add(newIsRead ? 'fa-eye-slash' : 'fa-eye');
+                    icon.dataset.isRead = newIsRead;
+                    const chatBtn = icon.closest('.chat-btn');
+                    chatBtn.classList.toggle('bg-gray-100', !newIsRead && chatBtn.dataset.friendId !== window.sessionUserId);
+                    chatBtn.classList.toggle('font-semibold', !newIsRead && chatBtn.dataset.friendId !== window.sessionUserId);
+                } else {
+                    icon.classList.remove('fa-spinner', 'fa-spin');
+                    icon.classList.add(currentIsRead ? 'fa-eye-slash' : 'fa-eye');
+                }
+            });
+        });
+    }
+
+    // Cargar historial de chat
+    async function loadChatHistory(friendId) {
+        try {
+            const response = await fetch(`/main/api/get_messages.php?friend_id=${friendId}`, { credentials: 'include' });
+            const data = await response.json();
+            if (data.success) {
+                const messages = data.messages;
+                chatMessages.innerHTML = messages.map(msg => `
+                    <div class="${msg.sender_id == window.sessionUserId ? 'text-right' : 'text-left'} mb-2">
+                        <span class="inline-block ${msg.sender_id == window.sessionUserId ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'} p-2 rounded-lg text-sm">${msg.content}</span>
+                    </div>
+                `).join('');
+                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                lastMessageId = messages.length ? messages[messages.length - 1].id : 0;
+            }
+        } catch (error) {
+            console.error('Error loading chat history:', error);
+            chatMessages.innerHTML = '<p class="text-sm text-gray-500">Error loading messages</p>';
+        }
+    }
+
+    // Alternar estado de lectura de un mensaje
+    async function toggleMessageReadStatus(messageId, isRead) {
+        try {
+            const response = await fetch('/main/api/mark_message_read.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `message_id=${messageId}&is_read=${isRead ? 1 : 0}`,
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.success) {
+                return true;
+            } else {
+                console.error('Failed to toggle message read status:', data.message);
+                return false;
+            }
+        } catch (error) {
+            console.error('Error toggling message read status:', error);
+            return false;
+        }
+    }
+
+    // Marcar chat como leído al abrirlo
+    async function markChatAsRead(friendId) {
+        try {
+            const response = await fetch('/main/api/mark_chat_read.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `friend_id=${friendId}`,
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.success) {
+                loadChats();
+                updateNotificationCount();
+            }
+        } catch (error) {
+            console.error('Error marking chat as read:', error);
+        }
+    }
+
+    // Verificar seguimiento mutuo
+    async function checkMutualFollow(followingId) {
+        try {
+            const response = await fetch(`/main/api/check_mutual_follow.php?following_id=${followingId}`, { credentials: 'include' });
+            const data = await response.json();
+            return data.success && data.is_mutual;
+        } catch (error) {
+            console.error('Error checking mutual follow:', error);
+            return false;
+        }
+    }
+
+    // Enviar mensaje (solo si hay seguimiento mutuo)
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const content = chatInput.value.trim();
+        if (content && currentFriendId) {
+            const isMutual = await checkMutualFollow(currentFriendId);
+            if (!isMutual) {
+                alert('You can only message users who follow you back.');
+                return;
+            }
+            try {
+                const response = await fetch('/main/api/send_message.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `receiver_id=${currentFriendId}&content=${encodeURIComponent(content)}`,
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    chatMessages.innerHTML += `
+                        <div class="text-right mb-2">
+                            <span class="inline-block bg-blue-500 text-white p-2 rounded-lg text-sm">${data.message.content}</span>
+                        </div>
+                    `;
+                    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                    lastMessageId = data.message.id;
+                    chatInput.value = '';
+                    loadChats();
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        }
+    });
+
+    // Polling para nuevos mensajes y notificaciones
+    function startPolling(friendId) {
+        clearInterval(pollingInterval);
+        pollingInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`/main/api/get_messages.php?friend_id=${friendId}`, { credentials: 'include' });
+                const data = await response.json();
+                if (data.success) {
+                    const newMessages = data.messages.filter(msg => msg.id > lastMessageId);
+                    newMessages.forEach(msg => {
+                        chatMessages.innerHTML += `
+                            <div class="${msg.sender_id == window.sessionUserId ? 'text-right' : 'text-left'} mb-2">
+                                <span class="inline-block ${msg.sender_id == window.sessionUserId ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'} p-2 rounded-lg text-sm">${msg.content}</span>
+                            </div>
+                        `;
+                        lastMessageId = msg.id;
+                    });
+                    if (newMessages.length) {
+                        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                        loadChats();
+                    }
+                }
+
+                await checkForNewMessages();
+            } catch (error) {
+                console.error('Error polling messages:', error);
+            }
+        }, 5000);
+    }
+
+    // Verificar nuevos mensajes de cualquier amigo y mostrar notificaciones
+    async function checkForNewMessages() {
+        try {
+            const response = await fetch('/main/api/get_all_unread_messages.php', { credentials: 'include' });
+            const data = await response.json();
+            if (data.success && data.messages.length) {
+                const newMessages = data.messages.filter(msg => msg.id > lastCheckedMessageId);
+                newMessages.forEach(msg => {
+                    if (msg.sender_id !== window.sessionUserId && !msg.is_read) {
+                        showNotification(msg.id, msg.sender_name, msg.content, msg.sender_id);
+                        lastCheckedMessageId = msg.id;
+                    }
+                });
+                updateNotificationCount();
+            }
+        } catch (error) {
+            console.error('Error checking for new messages:', error);
+        }
+    }
+
+    // Mostrar notificación flotante
+    function showNotification(messageId, senderName, content, friendId) {
+        const notification = document.createElement('div');
+        notification.innerHTML = notificationTemplate(messageId, senderName, content, friendId);
+        document.body.appendChild(notification);
+
+        notification.addEventListener('click', async () => {
+            currentFriendId = friendId;
+            chatTitle.textContent = senderName;
+            chatWindow.classList.remove('hidden');
+            await toggleMessageReadStatus(messageId, true);
+            await markChatAsRead(friendId);
+            loadChatHistory(friendId);
+            startPolling(friendId);
+            notification.remove();
+        });
+
+        notification.querySelector('.close-notification').addEventListener('click', (e) => {
+            e.stopPropagation();
+            notification.remove();
+        });
+
+        setTimeout(() => {
+            if (notification.parentNode) notification.remove();
+        }, 10000);
+    }
+
+    // Actualizar conteo de notificaciones no leídas
+    async function updateNotificationCount() {
+        try {
+            const response = await fetch('/main/api/get_all_unread_messages.php', { credentials: 'include' });
+            const data = await response.json();
+            const unreadCountBadge = document.getElementById('unread-count');
+            const mobileUnreadCountBadge = document.getElementById('mobile-unread-count');
+            if (data.success) {
+                const unreadCount = data.messages.filter(msg => !msg.is_read).length;
+                if (unreadCount > 0) {
+                    unreadCountBadge.textContent = unreadCount;
+                    unreadCountBadge.classList.remove('hidden');
+                    mobileUnreadCountBadge.textContent = unreadCount;
+                    mobileUnreadCountBadge.classList.remove('hidden');
+                } else {
+                    unreadCountBadge.classList.add('hidden');
+                    mobileUnreadCountBadge.classList.add('hidden');
+                }
+            }
+        } catch (error) {
+            console.error('Error updating notification count:', error);
+        }
+    }
+
+    // Minimizar/Maximizar chat
+    let isMinimized = false;
+    minimizeChat.addEventListener('click', () => {
+        isMinimized = !isMinimized;
+        if (isMinimized) {
+            chatWindow.style.height = '40px';
+            chatMessagesContainer.classList.add('hidden');
+            chatForm.classList.add('hidden');
+        } else {
+            chatWindow.style.height = '';
+            chatMessagesContainer.classList.remove('hidden');
+            chatForm.classList.remove('hidden');
+        }
+    });
+
+    // Cerrar chat
+    closeChat.addEventListener('click', () => {
+        chatWindow.classList.add('hidden');
+        currentFriendId = null;
+        clearInterval(pollingInterval);
+    });
+
+    // Iniciar carga de amigos, chats y polling global
+    loadFriends();
+    loadChats();
+    setInterval(checkForNewMessages, 5000);
+}
+
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
