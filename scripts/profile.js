@@ -79,10 +79,10 @@ async function fetchProfileByUsername(username) {
                                 Follow
                                 <i class="fa-solid fa-user-plus ml-2"></i>
                             </button>
-                            <button class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium">
+                            <a href="/main/messages.html" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium">
                                 Message
                                 <i class="fa-regular fa-message ml-2"></i>
-                            </button>
+                            </a>
                         </div>
                     </div>
                     <p class="mt-6 text-gray-600 dark:text-gray-300">${user.description || 'Hi, I\'m a member of the Nimbus community. Check out my posts below!'}</p>

@@ -167,6 +167,35 @@ const notificationTemplate = (messageId, senderName, content, friendId) => `
     </div>
 `;
 
+// Template para el modal de mensajes
+const messagesModalTemplate = `
+    <div id="messages-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
+            <button id="close-messages-modal" class="absolute top-4 right-4 text-gray-600 hover:text-gray-800">
+                <i class="fa-solid fa-times text-xl"></i>
+            </button>
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Messages</h2>
+            <section id="modal-messages" class="space-y-3"></section>
+        </div>
+    </div>
+`;
+
+// Template para el modal de notificaciones
+const notificationsModalTemplate = `
+    <div id="notifications-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto p-4 relative">
+            <button id="close-notifications-modal" class="absolute top-4 right-4 text-gray-600 hover:text-gray-800">
+                <i class="fa-solid fa-times text-xl"></i>
+            </button>
+            <h3 class="px-4 py-3 text-sm font-semibold text-gray-800 border-b border-gray-200 bg-gray-50 rounded-t-xl">Notifications</h3>
+            <div id="modal-notifications-list" class="max-h-64 overflow-y-auto"></div>
+            <div class="px-4 py-3 text-sm text-blue-600 hover:bg-gray-100 rounded-b-xl transition-colors duration-150">
+                <a href="/main/notify.html" class="block w-full">See all notifications</a>
+            </div>
+        </div>
+    </div>
+`;
+
 async function fetchSessionUserId() {
     try {
         const response = await fetch('/main/api/user.php', { credentials: 'include' });
@@ -186,6 +215,8 @@ function injectNavigation() {
         const sectionElement = document.querySelector('#floating-section');
         const mobileMenuElement = document.querySelector('#mobile-menu');
         const chatWindowElement = document.querySelector('#chat-window');
+        const messagesModalElement = document.querySelector('#messages-modal');
+        const notificationsModalElement = document.querySelector('#notifications-modal');
 
         if (headerElement) headerElement.outerHTML = headerTemplate;
         else document.body.insertAdjacentHTML('afterbegin', headerTemplate);
@@ -200,9 +231,12 @@ function injectNavigation() {
         else document.body.insertAdjacentHTML('beforeend', mobileMenuTemplate);
 
         if (!chatWindowElement) document.body.insertAdjacentHTML('beforeend', chatWindowTemplate);
+        if (!messagesModalElement) document.body.insertAdjacentHTML('beforeend', messagesModalTemplate);
+        if (!notificationsModalElement) document.body.insertAdjacentHTML('beforeend', notificationsModalTemplate);
 
         setupSearch();
         setupFriendsAndChat();
+        setupMobileMenu();
 
         document.dispatchEvent(new Event('navigationReady'));
     });
@@ -211,6 +245,7 @@ function injectNavigation() {
 document.addEventListener('DOMContentLoaded', () => {
     injectNavigation();
 });
+
 
 function setupSearch() {
     const searchInput = document.getElementById('search-input');
@@ -278,6 +313,311 @@ function setupSearch() {
         }
     });
 }
+
+
+function setupMobileMenu() {
+    const messagesLink = document.querySelector('#mobile-menu a[href="/main/messages.html"]');
+    const notifyLink = document.querySelector('#mobile-menu a[href="/main/notify.html"]');
+
+    if (window.innerWidth < 768) {
+        messagesLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showMessagesModal();
+        });
+
+        notifyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showNotificationsModal();
+        });
+    }
+}
+
+async function showMessagesModal() {
+    const modal = document.getElementById('messages-modal');
+    const messagesSection = document.getElementById('modal-messages');
+    const closeButton = document.getElementById('close-messages-modal');
+
+    modal.classList.remove('hidden');
+    await loadChatsInModal(messagesSection);
+
+    closeButton.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    }, { once: true });
+
+    // Cerrar modal al hacer clic fuera
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    }, { once: true });
+}
+
+async function loadChatsInModal(messagesSection) {
+    try {
+        const response = await fetch('/main/api/get_chats.php', { credentials: 'include' });
+        const data = await response.json();
+        if (data.success) {
+            messagesSection.innerHTML = chatsTemplate(data.chats);
+            setupModalChatListeners(messagesSection);
+        } else {
+            messagesSection.innerHTML = '<p class="text-sm text-gray-500">Error loading chats</p>';
+        }
+    } catch (error) {
+        console.error('Error loading chats in modal:', error);
+        messagesSection.innerHTML = '<p class="text-sm text-gray-500">Error loading chats</p>';
+    }
+}
+
+function chatsTemplate(chats) {
+    return `
+        <ul class="space-y-3">
+            ${chats.length ? chats.map(chat => `
+                <li class="chat-item flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors duration-200" data-friend-id="${chat.friend_id}" data-username="${chat.username}">
+                    <img src="${chat.profile_picture || '/main/images/profile/default-avatar.png'}" class="w-10 h-10 rounded-full object-cover mr-3">
+                    <div class="flex-1">
+                        <span class="font-medium text-gray-800">${chat.username}</span>
+                        <p class="text-sm text-gray-600 truncate ${chat.is_read ? '' : 'font-semibold'}">${chat.last_message}</p>
+                    </div>
+                    <span class="text-xs text-gray-500">${new Date(chat.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    ${chat.is_read ? '' : '<span class="w-2 h-2 bg-blue-500 rounded-full ml-2"></span>'}
+                </li>
+            `).join('') : '<p class="text-sm text-gray-500">No messages yet</p>'}
+        </ul>
+    `;
+}
+
+function setupModalChatListeners(messagesSection) {
+    messagesSection.querySelectorAll('.chat-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const friendId = item.dataset.friendId;
+            const username = item.dataset.username;
+            loadConversationInModal(messagesSection, friendId, username);
+        });
+    });
+}
+
+async function loadConversationInModal(messagesSection, friendId, username) {
+    try {
+        const response = await fetch(`/main/api/get_messages.php?friend_id=${friendId}`, { credentials: 'include' });
+        const data = await response.json();
+        if (data.success) {
+            messagesSection.innerHTML = conversationTemplate(friendId, username, data.messages);
+            setupModalConversationListeners(messagesSection, friendId, username, data.messages);
+
+            await fetch('/main/api/mark_chat_read.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `friend_id=${friendId}`,
+                credentials: 'include'
+            });
+        } else {
+            messagesSection.innerHTML = '<p class="text-sm text-gray-500">Error loading conversation</p>';
+        }
+    } catch (error) {
+        console.error('Error loading conversation in modal:', error);
+        messagesSection.innerHTML = '<p class="text-sm text-gray-500">Error loading conversation</p>';
+    }
+}
+
+function conversationTemplate(friendId, username, messages) {
+    return `
+        <div class="w-full">
+            <div class="flex items-center mb-4">
+                <button id="back-to-chats" class="text-gray-600 hover:text-gray-800 mr-3">
+                    <i class="fa-solid fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-xl font-semibold text-gray-800">${username}</h2>
+            </div>
+            <div id="conversation-messages" class="max-h-64 overflow-y-auto mb-4">
+                ${messages.map(msg => `
+                    <div class="${msg.sender_id == window.sessionUserId ? 'text-right' : 'text-left'} mb-2">
+                        <span class="inline-block ${msg.sender_id == window.sessionUserId ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'} p-2 rounded-lg text-sm">${msg.content}</span>
+                        <p class="text-xs text-gray-500">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                `).join('')}
+            </div>
+            <form id="message-form" class="flex items-center">
+                <input id="message-input" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Type a message..." />
+                <button type="submit" class="ml-2 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors duration-200">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    `;
+}
+
+function setupModalConversationListeners(messagesSection, friendId, username, initialMessages) {
+    const backButton = messagesSection.querySelector('#back-to-chats');
+    const messageForm = messagesSection.querySelector('#message-form');
+    const messageInput = messagesSection.querySelector('#message-input');
+    const messagesContainer = messagesSection.querySelector('#conversation-messages');
+
+    backButton.addEventListener('click', () => {
+        loadChatsInModal(messagesSection);
+    });
+
+    messageForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const content = messageInput.value.trim();
+        if (content) {
+            try {
+                const response = await fetch('/main/api/send_message.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `receiver_id=${friendId}&content=${encodeURIComponent(content)}`,
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    messagesContainer.innerHTML += `
+                        <div class="text-right mb-2">
+                            <span class="inline-block bg-blue-500 text-white p-2 rounded-lg text-sm">${data.message.content}</span>
+                            <p class="text-xs text-gray-500">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                        </div>
+                    `;
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    messageInput.value = '';
+                }
+            } catch (error) {
+                console.error('Error sending message in modal:', error);
+            }
+        }
+    });
+
+    let lastMessageId = initialMessages.length ? Math.max(...initialMessages.map(msg => msg.id)) : 0;
+    const pollingInterval = setInterval(async () => {
+        try {
+            const response = await fetch(`/main/api/get_messages.php?friend_id=${friendId}`, { credentials: 'include' });
+            const data = await response.json();
+            if (data.success) {
+                const newMessages = data.messages.filter(msg => msg.id > lastMessageId);
+                newMessages.forEach(msg => {
+                    messagesContainer.innerHTML += `
+                        <div class="${msg.sender_id == window.sessionUserId ? 'text-right' : 'text-left'} mb-2">
+                            <span class="inline-block ${msg.sender_id == window.sessionUserId ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'} p-2 rounded-lg text-sm">${msg.content}</span>
+                            <p class="text-xs text-gray-500">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                        </div>
+                    `;
+                    lastMessageId = msg.id;
+                });
+                if (newMessages.length) messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        } catch (error) {
+            console.error('Error polling messages in modal:', error);
+        }
+    }, 5000);
+
+    backButton.addEventListener('click', () => clearInterval(pollingInterval), { once: true });
+}
+
+async function showNotificationsModal() {
+    const modal = document.getElementById('notifications-modal');
+    const notificationsList = document.getElementById('modal-notifications-list');
+    const closeButton = document.getElementById('close-notifications-modal');
+
+    modal.classList.remove('hidden');
+    await loadNotificationsInModal(notificationsList);
+
+    closeButton.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    }, { once: true });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    }, { once: true });
+}
+
+async function loadNotificationsInModal(notificationsList) {
+    try {
+        const response = await fetch('/main/api/get_notifications.php', { credentials: 'include' });
+        const data = await response.json();
+        if (data.success && data.notifications?.length) {
+            notificationsList.innerHTML = data.notifications.map(notif => {
+                const redirectUrl = notif.type === 'follow'
+                    ? `/main/profile.html?user=@${notif.reference}`
+                    : `/main/post.html?post_id=${notif.reference || ''}`;
+                return `
+                    <div class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100 transition-colors duration-150 ${
+                        notif.is_read ? '' : 'font-semibold bg-gray-50'
+                    }" data-notification-id="${notif.id}">
+                        <a href="${redirectUrl}" class="flex justify-between items-center">
+                            <div>
+                                <span>${notif.message}</span>
+                                <span class="text-xs text-gray-500 block">${new Date(notif.created_at).toLocaleString()}</span>
+                            </div>
+                        </a>
+                        <button class="toggle-read-btn text-xs ${
+                            notif.is_read ? 'text-blue-500' : 'text-gray-500'
+                        }" title="${notif.is_read ? 'Mark as unread' : 'Mark as read'}">
+                            <i class="fa-regular ${notif.is_read ? 'fa-eye' : 'fa-eye-slash'} ml-2" size="small"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            setupModalNotificationListeners(notificationsList);
+        } else {
+            notificationsList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500">No new notifications</div>';
+        }
+    } catch (error) {
+        console.error('Error loading notifications in modal:', error);
+        notificationsList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500">Unable to load notifications</div>';
+    }
+}
+
+async function toggleNotificationRead(notificationId, isRead) {
+    try {
+        const response = await fetch('/main/api/mark_notification_read.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                notification_id: notificationId,
+                is_read: isRead ? 1 : 0 
+            }),
+            credentials: 'include'
+        });
+        const data = await response.json();
+        return data.success;
+    } catch (error) {
+        console.error('Error toggling notification read status:', error);
+        return false;
+    }
+}
+
+function setupModalNotificationListeners(notificationsList) {
+    notificationsList.querySelectorAll('.toggle-read-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            const notificationDiv = this.closest('[data-notification-id]');
+            const notificationId = notificationDiv.dataset.notificationId;
+            const currentState = !notificationDiv.classList.contains('font-semibold');
+            const newState = !currentState;
+
+            this.disabled = true;
+            this.innerHTML = '<i class="fa-solid fa-arrow-rotate-right animate-spin"></i>';
+
+            const success = await toggleNotificationRead(notificationId, newState);
+
+            if (success) {
+                notificationDiv.classList.toggle('font-semibold', !newState);
+                notificationDiv.classList.toggle('bg-gray-50', !newState);
+                this.classList.toggle('text-blue-500', newState);
+                this.classList.toggle('text-gray-500', !newState);
+                this.querySelector('i').setAttribute('class', 
+                    newState ? 'fa-eye' : 'fa-eye-slash');
+                this.setAttribute('title', 
+                    newState ? 'Mark as unread' : 'Mark as read');
+                await updateNotificationCount();
+            }
+
+            this.disabled = false;
+            this.innerHTML = `<i class="fa-regular ${newState ? 'fa-eye' : 'fa-eye-slash'} ml-2" size="small"></i>`;
+        });
+    });
+}
+
 
 function setupFriendsAndChat() {
     const sectionFriends = document.getElementById('section-friends');

@@ -181,6 +181,11 @@ async function fetchUserProfile() {
                         </a>
                     </li>
                     <li>
+                        <a href="/main/messages.html" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150">
+                            <i class="fa-regular fa-comments mx-2 text-lg"></i> Messages
+                        </a>
+                    </li>
+                    <li>
                         <a href="/main/settings.html" class="flex items-center block px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm transition-colors duration-150">
                             <i class="fa-solid fa-gear mx-2 text-lg"></i> Settings
                         </a>
@@ -279,7 +284,7 @@ function restrictUnauthorizedURLs() {
         '/main/index.html', '/main/profile.html', '/main/new_post.html',
         '/main/settings.html', '/main/trending.html', '/main/explorer.html',
         '/main/post.html', '/main/login.html', '/main/register.html',
-        '/main/edit_post.html', '/main/forgot_password.html'
+        '/main/edit_post.html', '/main/forgot_password.html', '/main/messages.html'
     ];
     const currentPath = window.location.pathname;
     if (!validPaths.includes(currentPath)) {
